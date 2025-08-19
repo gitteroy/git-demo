@@ -1,7 +1,3 @@
-feature c
+feature d
 
-<<<<<<< HEAD
-Welcome to Git Tutorial (Main)
-=======
-Welcome to Git Tutorial (B)
->>>>>>> feature-b
+Welcome to Git Tutorial
