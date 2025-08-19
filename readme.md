@@ -1,2 +1,1 @@
-change from main
-feature NO
+resolved c and main
