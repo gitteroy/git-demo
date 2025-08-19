@@ -1,1 +1,1 @@
-main only
+git merge main
