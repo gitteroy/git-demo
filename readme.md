@@ -1,2 +1,1 @@
-resolved c and main
-vasilis
+main only
