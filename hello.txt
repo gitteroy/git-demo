@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 Welcome to Git Tutorial (Main)
+=======
+Welcome to Git Tutorial (B)
+>>>>>>> feature-b
