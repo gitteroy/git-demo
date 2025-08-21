@@ -2,6 +2,8 @@ name: Deploy Packer (Access Keys)
 on:
   push:
     branches: [main]
+env:
+  AWS_REGION: ${{ vars.REGION }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
