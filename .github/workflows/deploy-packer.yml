@@ -1,0 +1,33 @@
+name: Deploy Packer (Access Keys)
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        with:
+          version: 1.11.1
+
+      - name: Run `packer init`
+        working-directory: ./packer/demo
+        run: "packer init ."
+
+      - name: Run `packer validate`
+        working-directory: ./packer/demo
+        run: "packer validate ."
+
+      - name: Run `packer build`
+        working-directory: ./packer/demo
+        run: "packer build ."

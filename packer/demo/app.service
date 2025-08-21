@@ -1,0 +1,15 @@
+[Unit]
+Description=Run Web App
+Requires=local-fs.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart=/home/ubuntu/app/app
+WorkingDirectory=/home/ubuntu/app
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/app.log
+StandardError=append:/var/log/app.error.log
+SyslogIdentifier=%n
