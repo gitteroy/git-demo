@@ -2,10 +2,12 @@ name: Deploy Application to S3
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'index.html'
+    tags:
+      - "s3_*"   # Matches tags like s3_1.0.0, s3_2.3.4, etc.
+    # branches:
+    #   - main
+    # paths:
+    #   - 'index.html'
 
   # Trigger after the infrastructure workflow completes successfully
   workflow_run:
