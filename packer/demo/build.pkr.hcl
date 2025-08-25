@@ -27,24 +27,22 @@ build {
     "source.amazon-ebs.ubuntu"
   ]
 
+  # Run your setup script first (e.g. install nvm, node, etc.)
   provisioner "shell" {
     script = "./setup.sh"
   }
 
+  # Upload the whole app folder
   provisioner "file" {
-    source = "./app/index"
-    destination = "/home/ubuntu/app/index"
+    source      = "./app"
+    destination = "/home/ubuntu/app"
   }
 
-  provisioner "file" {
-    source = "./app/package.json"
-    destination = "/home/ubuntu/app/package.json"
-  }
-
+  # Install dependencies inside the uploaded app
   provisioner "shell" {
     inline = [
-        "cd /home/ubuntu/app",
-        "npm install"
+      "cd /home/ubuntu/app",
+      "npm install"
     ]
   }
 }
