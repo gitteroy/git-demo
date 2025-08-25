@@ -1,10 +1,10 @@
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "raid-pkr-example"
-  instance_type = "t2.micro"
-  region        = "ap-southeast-1"
+  ami_name      = var.ami_name
+  instance_type = var.instance_type
+  region        = var.region
 
-  vpc_id        = "vpc-0c4783b07aa53d0d5"
-  subnet_id     = "subnet-0f4ef02cbb5d89edd"
+  vpc_id        = var.vpc_id
+  subnet_id     = var.subnet_id
   associate_public_ip_address = true
   ssh_interface = "public_ip"
   ssh_username  = "ubuntu"
@@ -29,7 +29,7 @@ build {
 
   # Run your setup script first (e.g. install nvm, node, etc.)
   provisioner "shell" {
-    script = "./setup.sh"
+    script = "./scripts/setup.sh"
   }
 
   # Upload the whole app folder

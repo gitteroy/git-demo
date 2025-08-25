@@ -27,13 +27,13 @@ jobs:
           version: 1.11.1
 
       - name: Run `packer init`
-        working-directory: ./packer/demo
+        working-directory: ./packer/builds/web-app
         run: "packer init ."
 
       - name: Run `packer validate`
-        working-directory: ./packer/demo
+        working-directory: ./packer/builds/web-app
         run: "packer validate ."
 
       - name: Run `packer build`
-        working-directory: ./packer/demo
+        working-directory: ./packer/builds/web-app
         run: "packer build ."
