@@ -1,7 +1,8 @@
 name: Deploy Website
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 env:
   AWS_REGION: ${{ vars.REGION }}
@@ -10,27 +11,21 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Upload index.html
-        run: aws s3 cp index.html s3://$S3_BUCKET/index.html --content-type text/html
-
-  deploy-sso:
-    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
       - uses: actions/checkout@v3
+
+      # STEP 1: PRINT THE OIDC TOKEN
+      - name: 🔬 Print OIDC Token for Learning
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            core.info('--- OIDC Token ---');
+            core.info(token);
+            core.info('------------------');
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -39,6 +34,13 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ vars.REGION }}
           audience: sts.amazonaws.com
+
+      # STEP 2: PRINT THE TEMPORARY AWS CREDENTIALS
+      - name: 🔬 Print Temporary AWS Credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}"
+          echo "AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}"
+          echo "AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}"
 
       - name: Upload index.html
         run: aws s3 cp index.html s3://$S3_BUCKET/index.html --content-type text/html
