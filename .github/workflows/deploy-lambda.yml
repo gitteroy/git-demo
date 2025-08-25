@@ -42,5 +42,5 @@ jobs:
       - name: Deploy to AWS Lambda
         run: |
           aws lambda update-function-code \
-            --function-name my-python-lambda \
+            --function-name ${{ vars.LAMBDA_NAME }} \
             --zip-file fileb://lambda/lambda-deployment.zip
