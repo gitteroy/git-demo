@@ -88,6 +88,31 @@ resource "aws_lambda_function" "this" {
   depends_on = [aws_iam_role_policy_attachment.lambda_policy]
 }
 
+## Secrets
+
+resource "aws_secretsmanager_secret" "bot_token" {
+  name = "timetosaygoodbye-telegram-bot-token"
+}
+
+resource "aws_iam_policy" "read_telegram_secret" {
+  name        = "ReadTelegramBotTokenSecretPolicy"
+  description = "Allows reading the Telegram bot token from Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action   = "secretsmanager:GetSecretValue",
+      Effect   = "Allow",
+      Resource = "${aws_secretsmanager_secret.bot_token.arn}"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "secret_policy_attachment" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.read_telegram_secret.arn
+}
+
 ## APIGATEWAY
 
 module "api_gateway" {
@@ -100,5 +125,5 @@ module "api_gateway" {
 
 output "api_endpoint" {
   description = "The public URL for the API Gateway."
-  value       = module.api_gateway.api_endpoint # <-- Get the output from the module
+  value       = module.api_gateway.api_endpoint
 }

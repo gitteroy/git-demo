@@ -4,7 +4,7 @@ import requests
 import boto3
 import traceback
 
-SECRET_NAME = "my-telegram-bot-token"
+SECRET_NAME = "timetosaygoodbye-telegram-bot-token"
 REGION_NAME = os.environ.get("AWS_REGION", "ap-southeast-1")
 
 def get_bot_token():
