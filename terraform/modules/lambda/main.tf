@@ -34,7 +34,7 @@ resource "aws_iam_role_policy_attachment" "secret" {
 }
 
 resource "aws_lambda_function" "this" {
-  filename         = data.archive_file.zip.output_path
+  filename         = "dummy.zip"
   function_name    = var.function_name
   role             = aws_iam_role.exec.arn
   handler          = "app.lambda_handler"
