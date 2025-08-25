@@ -87,3 +87,18 @@ resource "aws_lambda_function" "this" {
 
   depends_on = [aws_iam_role_policy_attachment.lambda_policy]
 }
+
+## APIGATEWAY
+
+module "api_gateway" {
+  source = "./modules/apigateway"
+
+  api_name             = "telegram-bot-api"
+  lambda_invoke_arn    = aws_lambda_function.this.invoke_arn
+  lambda_function_name = aws_lambda_function.this.function_name
+}
+
+output "api_endpoint" {
+  description = "The public URL for the API Gateway."
+  value       = module.api_gateway.api_endpoint # <-- Get the output from the module
+}
