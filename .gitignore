@@ -1,1 +1,13 @@
+.terraform
+*.auto.tfvars
+*.tfvars
+terraform.state
+*.tfstate
+*.tfstate.backup
+.terraform.tfstate.lock.info
+
+*.env
+.DS_Store
+environment/.DS_Store
+
 node_modules

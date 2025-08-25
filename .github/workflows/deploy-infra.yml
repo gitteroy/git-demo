@@ -1,0 +1,49 @@
+name: Deploy AWS Infrastructure
+
+on:
+  push:
+    branches:
+      - main # Triggers on push to the main branch
+    paths:
+      - 'terraform/**' # Only runs if Terraform files change
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  id-token: write # Required for OIDC authentication
+  contents: read  # Required to checkout the code
+
+jobs:
+  terraform:
+    name: Terraform Plan and Apply
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -input=false
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        # This step only runs on pushes to the 'main' branch
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+        working-directory: ./terraform
