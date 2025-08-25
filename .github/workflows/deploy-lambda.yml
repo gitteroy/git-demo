@@ -1,11 +1,18 @@
-name: Deploy Python Lambda Function
+name: Deploy to Lambda
 
 on:
+  # Trigger 1: On a push to the main branch IF files in lambda/ changed
   push:
     branches:
       - main
     paths:
       - 'lambda/**'
+
+  # Trigger 2: On any push that creates a tag matching the pattern 'lambda_**'
+  create:
+    tags:
+      - 'lambda_**'
+  
   workflow_dispatch:
 
 permissions:

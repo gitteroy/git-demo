@@ -1,4 +1,4 @@
-name: Deploy Packer (Access Keys)
+name: Deploy with Packer
 on:
   push:
     branches:
@@ -16,9 +16,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ vars.REGION }}
+          audience: sts.amazonaws.com
 
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main

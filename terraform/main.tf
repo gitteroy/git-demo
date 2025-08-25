@@ -12,9 +12,9 @@ module "s3_website" {
 }
 
 module "telegram_bot_lambda" {
-  source           = "./modules/lambda"
-  function_name    = var.lambda_function_name
-  secret_arn       = aws_secretsmanager_secret.bot_token.arn
+  source        = "./modules/lambda"
+  function_name = var.lambda_function_name
+  secret_arn    = aws_secretsmanager_secret.bot_token.arn
 }
 
 module "api_gateway" {
