@@ -2,14 +2,11 @@ name: Deploy to S3
 
 on:
   push:
-    tags:
-      - "s3_*"   # Matches tags like s3_1.0.0, s3_2.3.4, etc.
-    # branches:
-    #   - main
-    # paths:
-    #   - 'index.html'
+    branches:
+      - main
+    paths:
+      - 'index.html'
 
-  # Trigger after the infrastructure workflow completes successfully
   workflow_run:
     workflows: ["Deploy AWS Infrastructure"]
     types:
