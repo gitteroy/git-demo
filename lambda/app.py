@@ -8,7 +8,7 @@ SECRET_NAME = "timetosaygoodbye-telegram-bot-token"
 REGION_NAME = "ap-southeast-1"
 
 def get_bot_token():
-    """Fetches the bot token from AWS Secrets Manager."""x
+    """Fetches the bot token from AWS Secrets Manager."""
     try:
         secrets_client = boto3.client('secretsmanager', region_name=REGION_NAME)
         secret_response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
