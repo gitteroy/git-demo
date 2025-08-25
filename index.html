@@ -3,20 +3,757 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Git & CI/CD Workshop</title>
+    <title>Interactive Git & CI/CD Course Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <!-- Chosen Palette: Calm Tech -->
+    <!-- Application Structure Plan: The application is now structured into Overview, Schedule, Prerequisites, Lectures, a new Hands-On Lab section, the Setup Guide (acting as the answer key), and Files. This creates a clear pedagogical flow from theory (Lectures) to practice (Labs) to reference (Setup Guide). -->
+    <!-- Visualization & Content Choices: Report Info: Hands-On Lab -> Goal: Guide/Challenge -> Viz/Presentation: Accordion with task-based structure -> Interaction: Expand/collapse tasks and hints -> Justification: Structures the lab like a formal assignment, encouraging students to attempt the steps themselves before referring to the detailed Setup Guide. This promotes active learning and problem-solving. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        body { font-family: sans-serif; }
+        .nav-link { transition: all 0.2s ease-in-out; }
+        .nav-link.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s ease-in-out;
+        }
+        .accordion-content.open {
+            grid-template-rows: 1fr;
+        }
+        .accordion-content > div {
+            overflow: hidden;
+        }
+        .code-block {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        /* Prism.js theme overrides for consistency */
+        .code-block pre[class*="language-"] {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 0;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #4b5563;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+        .copy-btn:hover { background-color: #6b7280; }
+        .setup-step {
+            padding-left: 1.5rem;
+            border-left: 2px solid #e5e7eb;
+            margin-left: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .lecture-content {
+            line-height: 1.75;
+        }
+        .lecture-content h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .lecture-content h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .lecture-content p, .lecture-content ul, .lecture-content ol {
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .lecture-content ul, .lecture-content ol {
+            padding-left: 1.5rem;
+        }
+        .lecture-content li {
+            margin-bottom: 0.5rem;
+        }
+        .lecture-content strong {
+            color: #1e293b;
+        }
+        .lecture-content code:not([class*="language-"]) {
+            background-color: #eef2ff;
+            color: #4338ca;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 3px;
+        }
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .diagram-box {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid;
+            border-radius: 0.375rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .diagram-arrow {
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">Git & GitHub CI/CD with AWS Deployment</h1>
+            <p class="text-slate-600 mt-2 text-lg">Your Interactive Course Guide</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center bg-white p-2 rounded-lg shadow-md mb-8 sticky top-4 z-10">
+            <button data-target="overview" class="nav-link active font-medium py-2 px-4 rounded-md">Overview</button>
+            <button data-target="schedule" class="nav-link font-medium py-2 px-4 rounded-md">Schedule</button>
+            <button data-target="prerequisites" class="nav-link font-medium py-2 px-4 rounded-md">Prerequisites</button>
+            <button data-target="lectures" class="nav-link font-medium py-2 px-4 rounded-md">Lectures</button>
+            <button data-target="hands-on-lab" class="nav-link font-medium py-2 px-4 rounded-md">Hands-on Lab</button>
+            <button data-target="setup-guide" class="nav-link font-medium py-2 px-4 rounded-md">Setup Guide</button>
+        </nav>
+
+        <main>
+            <section id="overview" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-600">Course Goal</h2>
+                    <p class="text-slate-700 leading-relaxed">
+                        To provide students with a practical, hands-on understanding of version control using Git, collaborative workflows on GitHub, and how to build a CI/CD pipeline to automatically test and deploy a web application to AWS S3 and CloudFront.
+                    </p>
+                </div>
+            </section>
+
+            <section id="schedule" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-600">⏰ Course Schedule</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-100"><tr><th class="p-3">Time</th><th class="p-3">Module</th><th class="p-3">Topics</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3">09:30 - 10:00</td><td class="p-3 font-semibold">Review</td><td class="p-3">Reflections from Day 2 - reviewing manual deployment</td></tr>
+                                <tr class="border-b bg-slate-50"><td class="p-3">10:00 - 10:15</td><td class="p-3 font-semibold">Introduction</td><td class="p-3">Course overview - Version Control and CI/CD</td></tr>
+                                <tr class="border-b"><td class="p-3">10:15 - 11:30</td><td class="p-3 font-semibold">Git Fundamentals</td><td class="p-3">Important git commands, branching, merge, rebase, PR, code reviews, GitHub</td></tr>
+                                <tr class="border-b bg-slate-50"><td class="p-3">11:30 - 13:00</td><td class="p-3 font-semibold">Lunch Break</td><td class="p-3">Amoy Street</td></tr>
+                                <tr class="border-b"><td class="p-3">13:00 - 14:00</td><td class="p-3 font-semibold">GitHub Actions</td><td class="p-3">Intro to workflows, runners, secrets, AWS auth, deploy to S3</td></tr>
+                                <tr class="border-b bg-slate-50"><td class="p-3">14:00 - 15:00</td><td class="p-3 font-semibold">Hands-On Lab (1)</td><td class="p-3">Create GitHub repo, create branch, push, merge, PR, git workflows</td></tr>
+                                <tr class="border-b"><td class="p-3">15:00 - 15:30</td><td class="p-3 font-semibold">Coffee Break</td><td class="p-3">Mondo Ice Cream</td></tr>
+                                <tr class="border-b bg-slate-50"><td class="p-3">15:30 - 16:30</td><td class="p-3 font-semibold">Hands-On Lab (2)</td><td class="p-3">Deploy to S3, make changes, verify changes</td></tr>
+                                <tr class="border-b"><td class="p-3">16:30 - 17:00</td><td class="p-3 font-semibold">Wrap-up & Q&A</td><td class="p-3">Review, next steps, and questions</td></tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="prerequisites" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-600">Quick Checklist</h2>
+                    <p class="mb-4">Before starting, ensure you have the following. For detailed instructions on AWS and GitHub configuration, please see the <button class="text-indigo-600 font-semibold hover:underline" data-target="setup-guide" id="goto-setup-guide">Setup Guide</button> tab.</p>
+                     <ul class="space-y-3 text-slate-700">
+                        <li class="flex items-start"><span class="mr-3 text-indigo-500">►</span>Git installed on your local machine</li>
+                        <li class="flex items-start"><span class="mr-3 text-indigo-500">►</span>A code editor (preferably VS Code) installed</li>
+                        <li class="flex items-start"><span class="mr-3 text-indigo-500">►</span>A free GitHub account</li>
+                        <li class="flex items-start"><span class="mr-3 text-indigo-500">►</span>An active AWS account (Free Tier is sufficient)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="lectures" class="content-section hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">📖 Theoretically...</h2>
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">1. Git Fundamentals<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-6 border-t border-slate-200 lecture-content">
+                                <h4>Why we need Git?</h4>
+                                <p>Imagine a team of developers working on the same code. Without a system, they might overwrite each other, leading to conflicting versions, i.e. chaos. A <strong>Version Control System (VCS)</strong>, like <strong>Git</strong>, tracks every single change made to the codebase. This allows developers to work in parallel (via branches), and provides a clear, authoritative history of the entire codebase.</p>
+                                <p>Git solves three core problems:</p>
+                                <ul class="list-disc">
+                                    <li><strong>Prevents Loss of Work:</strong> Every saved change (a "commit") is a permanent snapshot you can always return to.</li>
+                                    <li><strong>Enables Parallel Development:</strong> You can work on a risky new feature in a branch without messing up the main, working version of the code.</li>
+                                    <li><strong>Provides Context:</strong> The history of commits tells a story of **why** the code is the way it is, which is crucial for maintenance and debugging.</li>
+                                </ul>
+                                
+                                <h4>Git Fundamentals</h4>
+                                <p>To truly understand Git, you must grasp its three-stage process:</p>
+                                <div class="diagram">
+                                    <div class="diagram-box border-blue-500 text-blue-700">Working Directory</div>
+                                    <div class="diagram-arrow">→<div class="text-xs font-normal -mt-2">git add</div></div>
+                                    <div class="diagram-box border-yellow-500 text-yellow-700">Staging Area</div>
+                                    <div class="diagram-arrow">→<div class="text-xs font-normal -mt-2">git commit</div></div>
+                                    <div class="diagram-box border-green-500 text-green-700">Repository (<strong>.git</strong>)</div>
+                                </div>
+                                <ol class="list-decimal">
+                                    <li><strong>Working Directory:</strong> Project folder where you actively edit files. Files here are untracked by Git until you tell it otherwise.</li>
+                                    <li><strong>Staging Area:</strong> Use the <code>git add &lt;file&gt;</code> command to move specific, completed changes from your working directory to the staging area. This allows you to craft a logical, focused "save" rather than just saving everything you've touched.</li>
+                                    <li><strong>Repository:</strong> This is the permanent, safe storage. When you run <code>git commit</code>, Git takes everything in your staging area and creates a permanent, timestamped snapshot (a commit) in the hidden <strong>.git</strong> directory.</li>
+                                </ol>
+                                <h5>Essential Git Commands</h5>
+                                <ul class="list-disc">
+                                    <li><code>git init</code>: Initializes a new Git repository in the current folder.</li>
+                                    <li><code>git clone &lt;url&gt;</code>: Creates a local copy of a remote repository.</li>
+                                    <li><code>git checkout &lt;branch&gt;</code>: Switches to a different branch.</li>
+                                    <li><code>git switch &lt;branch&gt;</code>: An alternative to <code>checkout</code> for switching branches (simpler syntax).</li>
+                                    <li><code>git branch</code>: Lists all local branches and highlights the current branch.</li>
+                                    <li><code>git branch -r</code>: Lists remote branches.</li>
+                                    <li><code>git fetch</code>: Downloads commits, files, and refs from a remote repository into your local repo, but doesn't merge them.</li>
+                                    <li><code>git merge &lt;branch&gt;</code>: Combines the history of the specified branch into the current branch.</li>
+                                    <li><code>git pull</code>: Fetches changes from the remote repository and merges them into your current branch.</li>
+                                    <li><code>git push</code>: Sends your committed changes to a remote repository.</li>
+                                    <li><code>git add &lt;file&gt;</code>: Stages a file for the next commit.</li>
+                                    <li><code>git commit -m "&lt;message&gt;"</code>: Saves staged changes to the repository with a descriptive message.</li>
+                                    <li><code>git status</code>: Shows the status of changes as untracked, modified, or staged.</li>
+                                    <li><code>git log</code>: Shows the commit history for the current branch.</li>
+                                    <li><code>git diff</code>: Shows the differences between your working directory and the staging area.</li>
+                                    <li><code>git reset --hard &lt;commit&gt;</code>: Resets your branch to a specific commit (⚠ irreversible if commits are lost).</li>
+                                    <li><code>git revert &lt;commit&gt;</code>: Creates a new commit that undoes the changes of a previous commit (safe for shared branches).</li>
+                                    <li><code>git stash</code>: Temporarily saves uncommitted changes so you can work on something else.</li>
+                                    <li><code>git remote -v</code>: Shows the URLs of the remotes linked to your repo.</li>
+                                </ul>
+
+
+                                <h5>Typical Git Workflow</h5>
+                                <div class="code-block"><pre><code class="language-bash"># 1. Clone the repository (first time only)
+git clone git@github.com:your-org/your-repo.git
+
+# 2. Create and switch to a new feature branch
+git checkout -b feat/login-system
+
+# 3. Check the status of your working directory
+git status  # Shows which files are modified, staged, or untracked
+
+# 4. Stage changes for commit
+git add .   # Adds all modified/created files
+# or git add specific-file.js
+
+# 5. Commit changes with a clear message
+git commit -m "feat: add login form UI"
+
+# 6. Fetch the latest changes from remote (just in case)
+git fetch origin
+
+# 7. Merge or rebase latest changes from dev into your branch
+git merge origin/dev
+# or: git rebase origin/dev
+
+# 8. Push your branch to remote
+git push -u origin feat/login-system
+
+# 9. Open a Pull Request in your Git hosting platform
+# (GitHub, GitLab, Bitbucket, etc.)
+
+# 10. After merge, clean up local branch
+git checkout dev
+git pull origin dev
+git branch -d feat/login-system</code></pre></div>
+                                <h4>Git Best Practices for Teams</h4>
+                                <h5>Branching Strategy</h5>
+                                <p>In a team, branches are essential for managing complexity and preventing chaos. A common and effective strategy is <strong>GitFlow</strong>, which uses different types of branches for different purposes:</p>
+                                <ul class="list-disc">
+                                    <li><code>main</code>: Represents the official, production-ready release history. It should always be stable and deployable.</li>
+                                    <li><code>dev</code>: The integration branch for active development. All new features and fixes are merged here first.</li>
+                                    <li><code>stag</code>: The staging branch for final testing before production deployment.</li>
+                                    <li><code>prod</code>: The branch that reflects the live production environment.</li>
+                                    <li><code>feat/*</code>: Feature branches for developing new functionality (e.g., <code>feat/login-system</code>).</li>
+                                    <li><code>infra/*</code>: Infrastructure-related changes (e.g., Terraform scripts, deployment configurations).</li>
+                                    <li><code>fix/*</code>: Bug fix branches for addressing specific issues (e.g., <code>fix/memory-leak</code>).</li>
+                                    <li><code>chore/*</code>: Routine maintenance tasks like dependency upgrades, code formatting, or refactoring (e.g., <code>chore/update-libs</code>).</li>
+                                    <li><code>cicd/*</code>: Continuous Integration / Continuous Deployment pipeline-related changes (e.g., <code>cicd/github-actions</code>).</li>
+                                </ul>
+                                <p>This strategy ensures that the <code>main</code> branch is always clean, and different types of work (new features, infrastructure updates, bug fixes, maintenance tasks, and CI/CD changes) are properly isolated and easier to manage.</p>
+
+                                <h5>Clear and Conventional Commits</h5>
+                                <p>A commit is the atomic unit of work in Git. A project with a clean, well-documented commit history is a joy to work on. The industry standard is <strong>Conventional Commits</strong>, which enforces a simple rule structure for commit messages.</p>
+                                <ul class="list-disc">
+                                    <li><code>feat</code>:  A new feature</li>
+                                    <li><code>fix</code>: A bug fix</li>
+                                    <li><code>docs</code>: Documentation only changes</li>
+                                    <li><code>style</code>: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)</li>
+                                    <li><code>refactor</code>: A code change that neither fixes a bug or adds a feature</li>
+                                    <li><code>perf</code>: A code change that improves performance</li>
+                                    <li><code>test</code>: Adding missing tests</li>
+                                    <li><code>chore</code>: Changes to the build process or auxiliary tools and libraries such as documentation generation</li>
+                                    <li><code>cicd</code>: Changes to pipeline</li>
+                                </ul>
+
+                                <h5>Pull Requests (PRs)</h5>
+                                <p>A Pull Request (or Merge Request in GitLab) is a formal proposal to merge changes from one branch into another. It's the cornerstone of team collaboration.</p>
+                                <ul class="list-disc">
+                                    <li><strong>Purpose:</strong> It's not just about merging code. It's a forum for <strong>code review</strong>, discussion, and automated checks (CI).</li>
+                                    <li><strong>Best Practices for a Good PR:</strong>
+                                        <ul>
+                                            <li><strong>Keep it small and focused.</strong> A PR should do one thing well. A 50-line PR is much easier to review than a 5000-line one.</li>
+                                            <li><strong>Write a clear description.</strong> Explain *what* the PR does and *why*. Link to the relevant issue or ticket.</li>
+                                            <li><strong>Ensure CI passes.</strong> Never merge a PR with failing tests.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                
+                                <h5>Tagging Strategy</h5>
+                                <p>A <strong>tag</strong> is a pointer to a specific commit, used to mark important points in history, like releases. The most common strategy is <strong>Semantic Versioning (SemVer)</strong>.</p>
+                                <div class="code-block"><pre><code class="language-bash">v1.2.3  (Major.Minor.Patch)</code></pre></div>
+                                <ul class="list-disc">
+                                    <li><strong>MAJOR</strong> version is incremented for incompatible API changes.</li>
+                                    <li><strong>MINOR</strong> version is incremented for new, backward-compatible functionality.</li>
+                                    <li><strong>PATCH</strong> version is incremented for backward-compatible bug fixes.</li>
+                                </ul>
+                                <p>This gives clear meaning to your release versions and is what we will use to trigger our deployment workflow.</p>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">2. CI/CD Introduction<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-6 border-t border-slate-200 lecture-content">
+                                <h4>The "Why": Speed and Stability</h4>
+                                <p>In modern software, the biggest challenge is delivering new features to users quickly without breaking things. CI/CD is the cultural and technical foundation that makes this possible. It's an automated assembly line for your code.</p>
+                                <p><strong>Use Case:</strong> Imagine a team of 10 developers working on an e-commerce site. Without CI/CD, releases might happen once a month. They are large, risky, and require a "code freeze" and all-hands-on-deck manual testing. With CI/CD, every small change can be tested and deployed independently, potentially dozens of times a day. This reduces risk and gets value to customers faster.</p>
+
+                                <h4>Continuous Integration (CI): The Quality Control Station</h4>
+                                <p>CI is the practice of automating the integration of code changes from multiple contributors into a single software project. Its primary goal is to provide a rapid feedback loop.</p>
+                                <div class="diagram">
+                                    <div class="diagram-box border-blue-500 text-blue-700">Commit</div>
+                                    <div class="diagram-arrow">→</div>
+                                    <div class="diagram-box border-yellow-500 text-yellow-700">Build & Test</div>
+                                    <div class="diagram-arrow">→</div>
+                                    <div class="diagram-box border-green-500 text-green-700">Report</div>
+                                </div>
+                                <p><strong>Best Practice: The Build is Sacred.</strong> If the `main` branch build fails, it becomes the team's number one priority to fix it. A broken `main` blocks everyone and defeats the purpose of CI.</p>
+
+                                <h4>Continuous Deployment/Delivery (CD): The Shipping Department</h4>
+                                <p>CD automates the release of validated code to a production environment. It's crucial to distinguish between two types:</p>
+                                <ul class="list-disc">
+                                    <li><strong>Continuous Delivery:</strong> The CI pipeline verifies the code and packages it for release. The final deployment to production is triggered by a manual button press. This allows for business-level sign-off.</li>
+                                    <li><strong>Continuous Deployment:</strong> This is the ultimate goal. If the CI pipeline passes, the code is automatically deployed to production without any human intervention. This requires a high degree of confidence in your test suite.</li>
+                                </ul>
+
+                                <h4>Best Practice: Pipeline as Code</h4>
+                                <p>Your CI/CD pipeline is a critical piece of infrastructure. It should be treated like code. By defining your pipeline in a YAML file (like <strong>deploy.yml</strong>) that lives inside your repository, you gain several advantages:</p>
+                                <ul class="list-disc">
+                                    <li><strong>Version Control:</strong> Your pipeline's history is tracked in Git, just like your application code. You can see who changed it and why.</li>
+                                    <li><strong>Reproducibility:</strong> Anyone on the team can check out the repository and understand (and potentially run) the entire build and deployment process.</li>
+                                    <li><strong>Collaboration:</strong> Changes to the pipeline can be reviewed and approved via Pull Requests, just like any other code change.</li>
+                                </ul>
+                                <p>This principle, often called <b>GitOps</b>, is a cornerstone of modern DevOps practices. It makes your entire software delivery process more transparent, reliable, and collaborative.</p>
+
+                                <h5>GitHub Actions</h5>
+                                <p>GitHub Actions is a CI/CD platform built directly into GitHub. It allows you to automate your software workflows right from your repository. You can build, test, and deploy your code without needing an external service.</p>
+                                <p><strong>Key Components:</strong></p>
+                                <ul class="list-disc">
+                                    <li><strong>Workflow:</strong> An automated process defined by a YAML file (like our <strong>deploy.yml</strong>). A repository can have multiple workflows.</li>
+                                    <li><strong>Event:</strong> A specific activity that triggers a workflow. Examples include a <code>push</code> to a branch, a <code>pull_request</code> being opened, or a <code>tag</code> being created.</li>
+                                    <li><strong>Job:</strong> A set of steps that execute on the same runner. Jobs run in parallel by default.</li>
+                                    <li><strong>Step:</strong> An individual task that can run commands or an "action."</li>
+                                    <li><strong>Action:</strong> A reusable piece of code that performs a complex but common task. For example, <code>actions/checkout@v4</code> checks out your repository's code onto the runner.</li>
+                                    <li><strong>Runner:</strong> A server (usually a virtual machine) that runs your workflows. GitHub provides runners, or you can host your own.</li>
+                                </ul>
+                                <p><strong>Secrets vs. Variables:</strong> In our lab, we use both. <strong>Secrets</strong> are for sensitive information like your <b>AWS_SECRET_ACCESS_KEY</b>. They are encrypted and are not visible in the logs. <strong>Variables</strong> are for non-sensitive configuration data like your AWS region or S3 bucket name. They are visible in the logs.</p>
+                                <h5>Common Workflow Examples</h5>
+                                <p><strong>Running Tests on Pull Requests:</strong> This is a fundamental CI practice. This workflow triggers on any push to a pull request, checks out the code, sets up the environment (e.g., Node.js), and runs the test suite.</p>
+                                <div class="code-block"><pre><code class="language-yaml">
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+                                </code></pre></div>
+                                <p><strong>Deploying on Tag Push:</strong> This is the workflow we use in our lab. It ensures that only specific, versioned commits are deployed to production.</p>
+                                <div class="code-block"><pre><code class="language-yaml">
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Triggers on tags like v1.0.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # ... deployment steps for AWS ...
+                                </code></pre></div>
+                            </div>
+                        </div></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="hands-on-lab" class="content-section hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">🧪 Hands-on Lab Assignment</h2>
+                <div class="bg-blue-100 text-blue-800 p-4 rounded-lg mb-6"><strong>Overall Objective:</strong> To configure a complete CI/CD pipeline that automatically deploys a static website to AWS when a new version tag is pushed to a GitHub repository. If you get stuck, refer to the <button class="font-semibold hover:underline" data-target="setup-guide" id="goto-setup-guide-from-lab">Setup Guide</button> for detailed instructions.</div>
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Task 1: AWS Setup (Public Bucket)<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <p class="mb-2"><strong>Objective:</strong> To create and configure the basic AWS resources needed to host a public static website.</p>
+                                <p class="mb-4"><strong>Deliverable:</strong> A publicly accessible S3 bucket URL serving the website, and a set of AWS access keys saved securely.</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Sub-task 1.1:</strong> Create an IAM User with S3 permissions suitable for programmatic access.</li>
+                                    <li><strong>Sub-task 1.2:</strong> Create an S3 bucket and configure it for public static website hosting.</li>
+                                </ul>
+                                <div class="mt-4 p-3 bg-slate-100 rounded">
+                                    <strong class="text-slate-700">Hint:</strong> You will need to create a new IAM user, generate access keys, and then configure the S3 bucket's properties and permissions to make it public.
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Task 2: GitHub & Workflow Configuration<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <p class="mb-2"><strong>Objective:</strong> To set up a GitHub repository and configure it with the necessary workflow file and credentials to communicate with AWS.</p>
+                                <p class="mb-4"><strong>Deliverable:</strong> A GitHub repository containing the website code and the <strong>deploy.yml</strong> workflow, with all required secrets and variables configured.</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Sub-task 2.1:</strong> Create a new GitHub repository and clone it to your local machine.</li>
+                                    <li><strong>Sub-task 2.2:</strong> Add the <strong>index.html</strong> and <strong>deploy.yml</strong> files to your project in the correct locations.</li>
+                                    <li><strong>Sub-task 2.3:</strong> Configure your repository's Secrets and Variables with your AWS credentials and S3 bucket details.</li>
+                                </ul>
+                                <div class="mt-4 p-3 bg-slate-100 rounded">
+                                    <strong class="text-slate-700">Hint:</strong> Remember that sensitive data (access keys) goes into Secrets, while non-sensitive data (bucket name, region) goes into Variables.
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Task 3: Deploy & Verify<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <p class="mb-2"><strong>Objective:</strong> To trigger the automated deployment pipeline using a Git tag and verify that the website is successfully deployed and accessible.</p>
+                                <p class="mb-4"><strong>Deliverable:</strong> A successful run of the GitHub Actions workflow and the live website visible in a web browser via the S3 bucket's public URL.</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Sub-task 3.1:</strong> Commit and push your initial project files to the `main` branch on GitHub.</li>
+                                    <li><strong>Sub-task 3.2:</strong> Create a semantic version tag (e.g., `v1.0.0`) and push it to trigger the workflow.</li>
+                                    <li><strong>Sub-task 3.3:</strong> Monitor the workflow run in the "Actions" tab of your GitHub repository.</li>
+                                    <li><strong>Sub-task 3.4:</strong> Find your S3 bucket's static website hosting URL and verify that your website is live.</li>
+                                </ul>
+                                <div class="mt-4 p-3 bg-slate-100 rounded">
+                                    <strong class="text-slate-700">Hint:</strong> Use `git push origin &lt;tag_name&gt;` to push a tag. The S3 website URL can be found in the bucket's properties tab.
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+                     <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Bonus Task: Secure the Deployment with CloudFront<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <p class="mb-2"><strong>Objective:</strong> To refactor the deployment to use a private S3 bucket and a CloudFront distribution, which is the production-standard best practice.</p>
+                                <p class="mb-4"><strong>Deliverable:</strong> A private S3 bucket, a CloudFront distribution serving the website, and an updated CI/CD pipeline that invalidates the CloudFront cache on deployment.</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Sub-task 4.1:</strong> Make your S3 bucket private by blocking all public access.</li>
+                                    <li><strong>Sub-task 4.2:</strong> Create a CloudFront distribution, point it to your S3 bucket, and use Origin Access Control (OAC) to allow CloudFront to access the private bucket content.</li>
+                                    <li><strong>Sub-task 4.3:</strong> Update your IAM user's permissions to allow CloudFront cache invalidation.</li>
+                                    <li><strong>Sub-task 4.4:</strong> Update your <strong>deploy.yml</strong> file to include a step that invalidates the CloudFront cache after deploying to S3.</li>
+                                    <li><strong>Sub-task 4.5:</strong> Push a new tag and verify that the website is now accessible only through the CloudFront URL.</li>
+                                </ul>
+                                <div class="mt-4 p-3 bg-slate-100 rounded">
+                                    <strong class="text-slate-700">Hint:</strong> You'll need to add a new statement to your IAM policy for the `cloudfront:CreateInvalidation` action. The <strong>deploy-cloudfront.yml</strong> file in the Files section contains the new workflow step.
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="setup-guide" class="content-section hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">🛠️ End-to-End Setup & Deployment Guide</h2>
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Solution for Task 1: AWS Setup (Public Bucket)<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <ol class="list-decimal list-inside space-y-3">
+                                    <li><strong>Create IAM User:</strong> In AWS IAM, go to Users > Create user. Name it `github-actions-user`. On the permissions screen, select "Attach policies directly" and add the `AmazonS3FullAccess` policy. Create the user.</li>
+                                    <li><strong>Generate Access Keys:</strong> Click on the new user, go to the "Security credentials" tab, and click "Create access key". Choose "Command Line Interface (CLI)", confirm, and create the key. Save the Access Key ID and Secret Access Key.</li>
+                                    <li><strong>Create S3 Bucket:</strong> In AWS S3, create a new bucket with a unique name.</li>
+                                    <li><strong>Enable Public Access:</strong> In the "Permissions" tab of your bucket, turn OFF "Block all public access" and save the changes.</li>
+                                    <li><strong>Add Bucket Policy:</strong> Still in the "Permissions" tab, edit the Bucket policy and paste the following JSON, replacing `YOUR_BUCKET_NAME` with your actual bucket name.
+                                        <div class="code-block"><pre><code class="language-json">{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+        }
+    ]
+}</code></pre><button class="copy-btn">Copy</button></div>
+                                    </li>
+                                    <li><strong>Enable Static Hosting:</strong> In the "Properties" tab, enable "Static website hosting" and set the index document to <strong>index.html</strong>. Note the website endpoint URL.</li>
+                                </ol>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Solution for Task 2 & 3: GitHub & Local Setup<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <ol class="list-decimal list-inside space-y-3">
+                                    <li>Create a new GitHub repository.</li>
+                                    <li>On your local machine, create a project folder. Inside, create an <strong>index.html</strong> file with the following content:
+                                        <div class="code-block"><button class="copy-btn">Copy</button><pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Git &amp; CI/CD Workshop&lt;/title&gt;
+    &lt;style&gt;
         body { font-family: sans-serif; background-color: #f0f2f5; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
         main { background-color: #fff; padding: 2rem 3rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
         h1 { color: #007bff; }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Welcome to the CI/CD Workshop!</h1>
-    </header>
-    <main>
-        <p>This page was deployed automatically using GitHub Actions.</p>
-        <p>Make a change to this file, create a new tag, and push it to see the magic happen!</p>
-    </main>
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt;Welcome to the CI/CD Workshop!&lt;/h1&gt;
+    &lt;/header&gt;
+    &lt;main&gt;
+        &lt;p&gt;This page was deployed automatically using GitHub Actions.&lt;/p&gt;
+        &lt;p&gt;Make a change to this file, create a new tag, and push it to see the magic happen!&lt;/p&gt;
+    &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+                                        </div>
+                                    </li>
+                                    <li>Initialize a Git repository and link it to your remote repo:
+                                        <div class="code-block"><pre><code class="language-bash">git init
+git remote add origin &lt;YOUR_REPO_URL&gt;</code></pre><button class="copy-btn">Copy</button></div>
+                                    </li>
+                                    <li>Create the workflow directory: <strong>.github/workflows/</strong>. Create a <strong>deploy.yml</strong> file inside it with this content:
+                                        <div class="code-block"><button class="copy-btn">Copy</button><pre><code class="language-yaml">name: Deploy to AWS S3
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync . s3://${{ vars.AWS_S3_BUCKET }} --delete --acl public-read
+</code></pre></div>
+                                    </li>
+                                    <li>Go to your GitHub repo > <strong>Settings</strong> > <strong>Secrets and variables</strong> > <strong>Actions</strong>.</li>
+                                    <li>Under <strong>Secrets</strong>, add `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` with the values you saved from AWS.</li>
+                                    <li>Under <strong>Variables</strong>, add `AWS_REGION` and `AWS_S3_BUCKET` with your specific values.</li>
+                                    <li>Stage, commit, and push your initial files to GitHub:
+                                        <div class="code-block"><pre><code class="language-bash">git add .
+git commit -m "feat: initial commit"
+git push -u origin main</code></pre><button class="copy-btn">Copy</button></div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Solution for Task 3: Deploy and Verify<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <ol class="list-decimal list-inside space-y-3">
+                                    <li>To trigger the first deployment, create and push a tag:
+                                        <div class="code-block"><pre><code class="language-bash">git tag v1.0.0
+git push origin v1.0.0</code></pre><button class="copy-btn">Copy</button></div>
+                                    </li>
+                                    <li>Go to the <strong>Actions</strong> tab in your GitHub repository. You should see your workflow running.</li>
+                                    <li>Once the workflow completes successfully, go to your S3 bucket's "Properties" tab, find the "Static website hosting" endpoint URL, and open it in your browser. You should see your deployed website!</li>
+                                </ol>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center">Solution for Bonus Task: Secure with CloudFront<span class="transform transition-transform duration-300">▼</span></button>
+                        <div class="accordion-content"><div>
+                            <div class="p-4 border-t border-slate-200">
+                                <ol class="list-decimal list-inside space-y-3">
+                                    <li><strong>Make Bucket Private:</strong> In your S3 bucket's "Permissions" tab, turn ON "Block all public access" and delete the public bucket policy.</li>
+                                    <li><strong>Create CloudFront Distribution:</strong> In CloudFront, create a new distribution. For the origin, select your S3 bucket. For Origin access, choose "Origin access control settings (OAC)" and create a new one.</li>
+                                    <li><strong>Update S3 Policy:</strong> When prompted, click "Copy policy" and paste this new policy into your S3 bucket's policy editor. This allows CloudFront to access your now-private bucket.</li>
+                                    <li><strong>Update IAM Permissions:</strong> In IAM, go to your `github-actions-user`, and add a new inline policy. Use the JSON editor and add this statement, replacing the placeholders. This allows the user to create cache invalidations.
+                                        <div class="code-block"><pre><code class="language-json">{
+    "Effect": "Allow",
+    "Action": "cloudfront:CreateInvalidation",
+    "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:distribution/YOUR_DISTRIBUTION_ID"
+}</code></pre><button class="copy-btn">Copy</button></div>
+                                    </li>
+                                    <li><strong>Update GitHub Workflow:</strong> Replace the content of your local <strong>deploy.yml</strong> file with this new content:
+                                        <div class="code-block"><button class="copy-btn">Copy</button><pre><code class="language-yaml">name: Deploy to AWS S3 and CloudFront
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync . s3://${{ vars.AWS_S3_BUCKET }} --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+</code></pre></div>
+                                    </li>
+                                    <li><strong>Update GitHub Variables:</strong> Go to your repository settings and add a new variable: `AWS_CLOUDFRONT_DISTRIBUTION_ID`.</li>
+                                    <li><strong>Deploy Again:</strong> Commit the changes to your workflow file, then create and push a new tag (e.g., `v1.1.0`).</li>
+                                    <li><strong>Verify:</strong> The old S3 URL should now be denied. The website should now be accessible via the CloudFront distribution's domain name.</li>
+                                </ol>
+                            </div>
+                        </div></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            const gotoSetupGuideBtn = document.getElementById('goto-setup-guide');
+            const gotoSetupGuideBtnFromLab = document.getElementById('goto-setup-guide-from-lab');
+
+            function handleNavClick(targetId) {
+                navLinks.forEach(nav => {
+                    nav.classList.toggle('active', nav.dataset.target === targetId);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('hidden', section.id !== targetId);
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    handleNavClick(e.currentTarget.dataset.target);
+                });
+            });
+
+            if(gotoSetupGuideBtn) {
+                gotoSetupGuideBtn.addEventListener('click', (e) => {
+                    handleNavClick(e.currentTarget.dataset.target);
+                });
+            }
+            if(gotoSetupGuideBtnFromLab) {
+                gotoSetupGuideBtnFromLab.addEventListener('click', (e) => {
+                    handleNavClick(e.currentTarget.dataset.target);
+                });
+            }
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span');
+                    content.classList.toggle('open');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            function copyToClipboard(button) {
+                const pre = button.nextElementSibling;
+                const textToCopy = pre.querySelector('code').innerText;
+                
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                } catch (err) {
+                    console.error('Fallback copy failed: ', err);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            document.body.addEventListener('click', function(e) {
+                if (e.target.classList.contains('copy-btn')) {
+                    e.stopPropagation();
+                    copyToClipboard(e.target);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
