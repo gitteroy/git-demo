@@ -39,12 +39,10 @@ resource "aws_lambda_function" "this" {
   role             = aws_iam_role.exec.arn
   handler          = "app.lambda_handler"
   runtime          = "python3.11"
-  source_code_hash = filebase64sha256("dummy.zip")
 
   lifecycle {
     ignore_changes = [
       filename,
-      source_code_hash,
     ]
   }
 
