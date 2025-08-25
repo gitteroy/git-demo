@@ -1,7 +1,7 @@
 variable "ami_name" {
   type        = string
-  default     = "raid-pkr-example-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
-  description = "Name for the generated AMI"
+  default     = "raid-pkr-example"
+  description = "Base name for the generated AMI"
 }
 
 variable "instance_type" {
