@@ -9,3 +9,9 @@ variable "s3_bucket_name" {
   type        = string
   default     = "elroy-git-demo-bucket-0000"
 }
+
+variable "lambda_function_name" {
+  description = "The name of the Lambda Function."
+  type        = string
+  default     = "my-python-lambda"
+}
