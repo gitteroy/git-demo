@@ -11,11 +11,19 @@ module "s3_website" {
   bucket_name = var.s3_bucket_name
 }
 
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "${path.root}/lambda"
+  output_path = "${path.root}/lambda.zip"
+}
+
 module "telegram_bot_lambda" {
   source        = "./modules/lambda"
   function_name = var.lambda_function_name
   secret_arn    = aws_secretsmanager_secret.bot_token.arn
+  filename      = data.archive_file.lambda_zip.output_path
 }
+
 
 module "api_gateway" {
   source               = "./modules/apigateway"
