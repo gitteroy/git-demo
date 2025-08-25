@@ -8,7 +8,7 @@ SECRET_NAME = "timetosaygoodbye-telegram-bot-token"
 REGION_NAME = "ap-southeast-1"
 
 def get_bot_token():
-    """Fetches the bot token from AWS Secrets Manager."""
+    """Fetches the bot token from AWS Secrets Manager."""x
     try:
         secrets_client = boto3.client('secretsmanager', region_name=REGION_NAME)
         secret_response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
@@ -38,7 +38,6 @@ def lambda_handler(event, context):
     """Handles incoming messages from Telegram via API Gateway."""
     bot_token = get_bot_token()
     if not bot_token:
-        # If we can't get the token, we can't do anything.
         return {"statusCode": 500, "body": "Internal server error: Bot token not configured."}
 
     try:
