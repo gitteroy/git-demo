@@ -1,0 +1,46 @@
+name: Deploy Python Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lambda/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create Deployment Package
+        working-directory: ./lambda
+        run: |
+          pip install -r requirements.txt -t ./package
+          cp app.py ./package/
+          cd package
+          zip -r ../lambda-deployment.zip .
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name my-python-lambda \
+            --zip-file fileb://lambda/lambda-deployment.zip
