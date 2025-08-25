@@ -15,7 +15,6 @@ module "telegram_bot_lambda" {
   source           = "./modules/lambda"
   function_name    = var.lambda_function_name
   secret_arn       = aws_secretsmanager_secret.bot_token.arn
-  source_code_path = "${path.root}/lambda"
 }
 
 module "api_gateway" {
