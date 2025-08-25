@@ -16,6 +16,10 @@ jobs:
   terraform:
     name: Terraform Plan and Apply
     runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_s3_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_aws_region: ${{ vars.REGION }}
     
     steps:
       - name: Checkout Repository
