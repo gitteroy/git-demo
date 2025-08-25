@@ -28,6 +28,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -41,24 +42,3 @@ jobs:
       - name: Upload index.html to S3
         run: |
           aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
-
-  # deploy-oidc:
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     id-token: write # This is required for requesting the JWT
-  #     contents: read  # This is required for actions/checkout
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3 # Download a copy of your repo's code onto the runner
-
-  #     # https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws
-  #     - name: Configure AWS credentials (OIDC)
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
-  #         role-session-name: GitHub_to_AWS_via_FederatedOIDC
-  #         aws-region: ${{ vars.REGION }}
-  #         audience: sts.amazonaws.com
-
-  #     - name: Upload index.html
-  #       run: aws s3 cp index.html s3://$S3_BUCKET/index.html --content-type text/html

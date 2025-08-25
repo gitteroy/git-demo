@@ -17,7 +17,7 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "headers": { "Content-Type": "application/json" },
             "body": json.dumps({
-                "message": "Successfully fetched the time for Singapore.",
+                "message": "Successfully fetched the time for Singapore!",
                 "currentTime": current_time
             })
         }
