@@ -13,8 +13,8 @@ module "s3_website" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/lambda"
-  output_path = "${path.root}/lambda.zip"
+  source_dir  = "${path.root}/../lambda"
+  output_path = "${path.root}/../lambda.zip"
 }
 
 module "telegram_bot_lambda" {
