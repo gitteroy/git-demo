@@ -33,19 +33,13 @@ resource "aws_iam_role_policy_attachment" "secret" {
   policy_arn = aws_iam_policy.read_secret.arn
 }
 
-data "archive_file" "zip" {
-  type        = "zip"
-  source_dir  = var.source_code_path
-  output_path = "${path.module}/${var.function_name}.zip"
-}
-
 resource "aws_lambda_function" "this" {
   filename         = data.archive_file.zip.output_path
   function_name    = var.function_name
   role             = aws_iam_role.exec.arn
   handler          = "app.lambda_handler"
   runtime          = "python3.11"
-  source_code_hash = data.archive_file.zip.output_base64sha256
+  source_code_hash = filebase64sha256("dummy.zip")
 
   lifecycle {
     ignore_changes = [
