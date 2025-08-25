@@ -1,7 +1,10 @@
 name: Deploy Packer (Access Keys)
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - 'packer/**'
 env:
   AWS_REGION: ${{ vars.REGION }}
 jobs:
