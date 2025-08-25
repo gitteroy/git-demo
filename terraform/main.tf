@@ -44,7 +44,7 @@ resource "aws_s3_bucket_policy" "website" {
 }
 
 output "website_endpoint" {
-  description = "The public URL for the S3 website."
+  description = "The public URL for the S3 website"
   value       = aws_s3_bucket_website_configuration.website.website_endpoint
 }
 
