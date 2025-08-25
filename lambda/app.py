@@ -7,7 +7,6 @@ def lambda_handler(event, context):
     and returns it in the response.
     """
     try:
-        # Call a public API
         response = requests.get("http://worldtimeapi.org/api/timezone/Asia/Singapore")
         response.raise_for_status()
         
@@ -24,7 +23,6 @@ def lambda_handler(event, context):
         }
 
     except requests.exceptions.RequestException as e:
-        # Handle potential network errors
         print(f"Error calling API: {e}")
         return {
             "statusCode": 500,
