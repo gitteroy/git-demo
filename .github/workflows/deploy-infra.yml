@@ -9,8 +9,8 @@ on:
   workflow_dispatch: # Allows manual triggering
 
 permissions:
-  id-token: write # Required for OIDC authentication
-  contents: read  # Required to checkout the code
+  id-token: write # enables workflow or a job within it to request and receive an OIDC JWT from GitHub's OIDC provider (aws-actions/configure-aws-credentials@v4)
+  contents: read  # enables read the content of a repository (actions/checkout@v4)
 
 jobs:
   terraform:
@@ -38,18 +38,14 @@ jobs:
           terraform_version: 1.12.2
 
       - name: Terraform Init
-        id: init
         run: terraform init
         working-directory: ./terraform
 
       - name: Terraform Plan
-        id: plan
         run: terraform plan -input=false
         working-directory: ./terraform
 
       - name: Terraform Apply
-        # This step only runs on pushes to the 'main' branch
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
         working-directory: ./terraform
 
@@ -68,9 +64,9 @@ jobs:
           message: |
             Terraform Deployment Status
             
-            Repository: `${{ github.repository }}`
-            Branch: `${{ github.ref_name }}`
-            Commit: `${{ github.sha }}`
-            Status: `${{ needs.terraform.result }}`
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Status: ${{ needs.terraform.result }}
             
             Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
