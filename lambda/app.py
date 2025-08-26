@@ -62,7 +62,6 @@ def lambda_handler(event, context):
         }
 
     try:
-        # Parse the request body
         body = json.loads(event.get("body", "{}"))
         print(f"Parsed body: {json.dumps(body, indent=2)}")
         
@@ -81,7 +80,7 @@ def lambda_handler(event, context):
             }
 
         if user_text == "/start":
-            reply_text = "Hello! I am a simple telegram bot. Try the `/about` command."
+            reply_text = "Hi! I am a simple telegram bot. Try the `/about` command."
         elif user_text == "/about":
             reply_text = "This bot runs on AWS Lambda (:"
         else:
