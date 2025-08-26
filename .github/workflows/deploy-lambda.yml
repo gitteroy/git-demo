@@ -8,7 +8,7 @@ on:
       - 'lambda/**'
 
   workflow_run:
-    workflows: ["Deploy AWS Infrastructure"]
+    workflows: ["Deploy Terraform"]
     types:
       - completed
     branches:

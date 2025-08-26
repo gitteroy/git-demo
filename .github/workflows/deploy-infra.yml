@@ -1,4 +1,4 @@
-name: Deploy AWS Infrastructure
+name: Deploy Terraform
 
 on:
   push:
