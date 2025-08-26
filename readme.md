@@ -12,6 +12,25 @@ By completing this tutorial, you'll understand:
 - **Automated AWS deployments** from GitHub
 - **Team collaboration** patterns and best practices
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Project Architecture](#project-architecture)
+- [Getting Started](#getting-started)
+- [Core Concepts Explained](#core-concepts-explained)
+- [Deployment Workflows Summary](#deployment-workflows-summary)
+- [Hands-On Exercises](#hands-on-exercises)
+  - [Exercise 1: Understanding Git Workflows](#exercise-1-understanding-git-workflows)
+  - [Exercise 2: Setting Up AWS Deployment](#exercise-2-setting-up-aws-deployment)
+  - [Exercise 3: Terraform Deep Dive](#exercise-3-terraform-deep-dive)
+  - [Exercise 4: Application Deployments](#exercise-4-application-deployments)
+  - [Exercise 5: Monitoring Your Deployment](#exercise-5-monitoring-your-deployment)
+- [Troubleshooting Common Issues](#troubleshooting-common-issues)
+- [Terraform Environment Management](#terraform-environment-management)
+- [Testing Your Deployments](#testing-your-deployments)
+- [Monitoring and Alerting](#monitoring-and-alerting)
+- [Additional Resources](#additional-resources)
+
 ## Prerequisites
 
 - Git fundamentals
@@ -113,6 +132,35 @@ on:
 - **S3:** Static website hosting
 - **Secrets Manager:** Secure storage for API keys
 - **IAM:** Permissions and security
+
+## Deployment Workflows Summary
+
+### Workflow Dependencies
+
+```md
+Terraform Infrastructure
+         ↓
+    ┌────────────────┐
+    │   S3 Deploy    │
+    │ Lambda Deploy  │
+    │ Packer Build   │
+    └────────────────┘
+```
+
+**Execution Order:**
+
+1. **Infrastructure first:** Terraform creates AWS resources
+2. **Applications second:** S3, Lambda, and Packer workflows run after infrastructure is ready
+3. **Path-based triggers:** Each workflow only runs when relevant files change
+
+### File Change Triggers
+
+| Path Changed | Workflows Triggered |
+|--------------|--------------------|
+| `terraform/**` | Deploy Infrastructure |
+| `index.html` | Deploy to S3 |
+| `lambda/**` | Deploy Lambda |
+| `packer/**` | Build AMI |
 
 ## Hands-On Exercises
 
@@ -275,6 +323,7 @@ resource "aws_lambda_function" "this" {
 **Trigger:** Push to main branch with changes to `index.html`
 
 **Key workflow steps:**
+
 ```yaml
 # .github/workflows/deploy-s3.yml
 on:
@@ -295,6 +344,7 @@ steps:
 **Trigger:** Push to main branch with changes in `lambda/` directory
 
 **Key workflow steps:**
+
 ```yaml
 # .github/workflows/deploy-lambda.yml
 steps:
@@ -313,6 +363,7 @@ steps:
 ```
 
 **Lambda Function Overview:**
+
 - **Purpose:** Telegram bot that responds to `/start` and `/about` commands
 - **Runtime:** Python 3.11
 - **Dependencies:** `requests`, `boto3`
@@ -325,6 +376,7 @@ steps:
 **Trigger:** Push to main branch with changes in `packer/` directory
 
 **Key components:**
+
 ```hcl
 # packer/builds/web-app/build.pkr.hcl
 source "amazon-ebs" "ubuntu" {
@@ -346,6 +398,7 @@ build {
 ```
 
 **What the AMI includes:**
+
 - Ubuntu 22.04 base image
 - Node.js application with dependencies
 - Systemd service configuration
@@ -390,7 +443,7 @@ terraform {
 
 **Solution:** Verify IAM role trust policy includes GitHub OIDC provider, and check if aud and sub are correct.
 
-## Environment Management
+## Terraform Environment Management
 
 There are a few ways to manage environments. Each method has its own use cases.
 
@@ -404,12 +457,12 @@ There are a few ways to manage environments. Each method has its own use cases.
 
 **Description:**
 
-* Each environment (dev, staging, prod) has its own Git branch.
-* Terraform code may be duplicated or partially shared.
+- Each environment (dev, staging, prod) has its own Git branch.
+- Terraform code may be duplicated or partially shared.
 
 **Structure Example:**
 
-```
+```md
 Branches:
 ┌─────────-┐        ┌───────────┐        ┌───────────┐
 | dev      |        | stag      |        | prod      |
@@ -422,29 +475,29 @@ Branches:
 
 **Pros:**
 
-* Easy to isolate changes per environment.
-* No risk of accidentally applying dev changes to prod.
+- Easy to isolate changes per environment.
+- No risk of accidentally applying dev changes to prod.
 
 **Cons:**
 
-* Duplication of code between branches (each has its own modules/); very difficult to update the modules.
+- Duplication of code between branches (each has its own modules/); very difficult to update the modules.
 
 **Use case:**
 
-* If require clear segregation between envs.
-* For teams familiar with having 1 env per branch.
+- If require clear segregation between envs.
+- For teams familiar with having 1 env per branch.
 
 ### **B. One folder per environment (single branch)**
 
 **Description:**
 
-* All environments live in the same branch.
-* Each environment has its own folder and `terraform.tfvars`.
-* Shared modules/
+- All environments live in the same branch.
+- Each environment has its own folder and `terraform.tfvars`.
+- Shared modules/
 
 **Structure Example:**
 
-```
+```md
 repo/
 ├─ envs/
 │  ├─ dev/
@@ -458,28 +511,28 @@ repo/
 
 **Pros:**
 
-* Single source of truth for shared modules.
-* Easier to refactor common code.
+- Single source of truth for shared modules.
+- Easier to refactor common code.
 
 **Cons:**
 
-* Branching/deployment logic can get more complex (we use specific regex tagged deployments to overcome this).
+- Branching/deployment logic can get more complex (we use specific regex tagged deployments to overcome this).
 
 **Use case:**
 
-* If large % of codebase are shared modules, but still want retain flexibility of deploying infra in each env.
-* Medium-sized companies with dedicated team to manage common modules.
+- If large % of codebase are shared modules, but still want retain flexibility of deploying infra in each env.
+- Medium-sized companies with dedicated team to manage common modules.
 
 ### **C. Single branch, workspaces or variables**
 
 **Description:**
 
-* Single Terraform configuration per module.
-* Use **Terraform workspaces** or environment-specific `tfvars` files.
+- Single Terraform configuration per module.
+- Use **Terraform workspaces** or environment-specific `tfvars` files.
 
 **Structure Example:**
 
-```
+```md
 repo/
 ├─ main.tf
 ├─ variables.tf
@@ -498,46 +551,18 @@ terraform apply -var-file=dev.tfvars
 
 **Pros:**
 
-* Minimal duplication.
+- Minimal duplication.
 
 **Cons:**
 
-* Fully shared IaC, only differentiated by env variables.
-* No branch promotion like in A.
-* Testing a new feature in dev immediately changes the code that staging/prod will eventually use.
+- Fully shared IaC, only differentiated by env variables.
+- No branch promotion like in A.
+- Testing a new feature in dev immediately changes the code that staging/prod will eventually use.
 
 **Use case:**
 
-* If all envs will have exact same infrastructure.
-* Small team just starting out; simple infra, no need much isolation between envs.
-
-## Deployment Workflows Summary
-
-### Workflow Dependencies
-
-```
-Terraform Infrastructure
-         ↓
-    ┌────────────────┐
-    │   S3 Deploy    │
-    │ Lambda Deploy  │
-    │ Packer Build   │
-    └────────────────┘
-```
-
-**Execution Order:**
-1. **Infrastructure first:** Terraform creates AWS resources
-2. **Applications second:** S3, Lambda, and Packer workflows run after infrastructure is ready
-3. **Path-based triggers:** Each workflow only runs when relevant files change
-
-### File Change Triggers
-
-| Path Changed | Workflows Triggered |
-|--------------|--------------------|
-| `terraform/**` | Deploy Infrastructure |
-| `index.html` | Deploy to S3 |
-| `lambda/**` | Deploy Lambda |
-| `packer/**` | Build AMI |
+- If all envs will have exact same infrastructure.
+- Small team just starting out; simple infra, no need much isolation between envs.
 
 ## Monitoring and Alerting
 
@@ -557,7 +582,8 @@ Terraform Infrastructure
 ## Testing Your Deployments
 
 ### S3 Website
-```bash
+
+```sh
 # Make a change to index.html
 echo "<h1>Updated content</h1>" >> index.html
 git add index.html
@@ -566,7 +592,8 @@ git push origin main
 ```
 
 ### Lambda Function
-```bash
+
+```sh
 # Modify lambda/app.py
 # Add a new command or change response text
 git add lambda/
@@ -575,7 +602,8 @@ git push origin main
 ```
 
 ### Packer AMI
-```bash
+
+```sh
 # Update packer configuration or app
 git add packer/
 git commit -m "feat: update AMI configuration"
