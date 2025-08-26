@@ -11,3 +11,4 @@ terraform.state
 environment/.DS_Store
 
 node_modules
+.venv

@@ -1,0 +1,42 @@
+name: Run SAST scans
+
+on:
+  push:
+    branches:
+      - main
+      - feature/sast
+    paths:
+      - 'sast/**'
+env:
+  AWS_REGION: ${{ vars.REGION }}
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-22.04
+    name: 'pip-audit'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pip packages
+        run: python -m pip install -r requirements.txt
+
+      - name: Perform pip audit
+        uses: pypa/gh-action-pip-audit@v1.0.6
+        with:
+          inputs: ./sast/app/requirements.txt
+  
+  bandit:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Perform Bandit Analysis
+        uses: PyCQA/bandit-action@v1
+        with:
+          targets: ./sast/app
