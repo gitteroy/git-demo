@@ -72,7 +72,13 @@ build {
     ]
   }
 
-    # Install and configure CloudWatch Agent
+  # Copy CloudWatch Agent config into the AMI
+  provisioner "file" {
+    source      = "files/amazon-cloudwatch-agent.json"
+    destination = "/tmp/amazon-cloudwatch-agent.json"
+  }
+
+  # Install and enable CloudWatch Agent
   provisioner "shell" {
     inline = [
       "sudo apt-get update -y",
@@ -80,62 +86,10 @@ build {
       "wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
       "sudo dpkg -i amazon-cloudwatch-agent.deb",
       "sudo mkdir -p /opt/aws/amazon-cloudwatch-agent/etc",
-
-      "cat > amazon-cloudwatch-agent.json <<'EOF'\n" +
-      "{\n" +
-      "  \"metrics\": {\n" +
-      "    \"metrics_collected\": {\n" +
-      "      \"cpu\": {\n" +
-      "        \"measurement\": [\n" +
-      "          { \"name\": \"cpu_usage_idle\", \"rename\": \"CPU_IDLE\", \"unit\": \"Percent\" },\n" +
-      "          { \"name\": \"cpu_usage_user\", \"rename\": \"CPU_USER\", \"unit\": \"Percent\" },\n" +
-      "          { \"name\": \"cpu_usage_system\", \"rename\": \"CPU_SYSTEM\", \"unit\": \"Percent\" }\n" +
-      "        ],\n" +
-      "        \"metrics_collection_interval\": 60,\n" +
-      "        \"totalcpu\": true\n" +
-      "      },\n" +
-      "      \"mem\": {\n" +
-      "        \"measurement\": [\n" +
-      "          { \"name\": \"mem_used_percent\", \"unit\": \"Percent\" }\n" +
-      "        ],\n" +
-      "        \"metrics_collection_interval\": 60\n" +
-      "      },\n" +
-      "      \"disk\": {\n" +
-      "        \"measurement\": [\n" +
-      "          { \"name\": \"disk_used_percent\", \"unit\": \"Percent\" }\n" +
-      "        ],\n" +
-      "        \"metrics_collection_interval\": 60,\n" +
-      "        \"resources\": [ \"*\" ]\n" +
-      "      },\n" +
-      "      \"net\": {\n" +
-      "        \"measurement\": [\n" +
-      "          \"bytes_sent\",\n" +
-      "          \"bytes_recv\"\n" +
-      "        ],\n" +
-      "        \"metrics_collection_interval\": 60,\n" +
-      "        \"resources\": [ \"*\" ]\n" +
-      "      }\n" +
-      "    }\n" +
-      "  },\n" +
-      "  \"logs\": {\n" +
-      "    \"logs_collected\": {\n" +
-      "      \"journald\": {\n" +
-      "        \"collect_list\": [\n" +
-      "          {\n" +
-      "            \"unit\": \"myapp.service\",\n" +
-      "            \"log_group_name\": \"/my-app/ec2\",\n" +
-      "            \"log_stream_name\": \"{instance_id}-app\"\n" +
-      "          }\n" +
-      "        ]\n" +
-      "      }\n" +
-      "    }\n" +
-      "  }\n" +
-      "}\n" +
-      "EOF",
-
-      "sudo mv amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+      "sudo mv /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
       "sudo systemctl enable amazon-cloudwatch-agent",
       "sudo systemctl start amazon-cloudwatch-agent"
     ]
   }
+
 }
