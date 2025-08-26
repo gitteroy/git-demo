@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'index.html'
-
   workflow_run:
     workflows: ["Deploy Terraform"]
     types:
@@ -17,7 +16,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     permissions:
       id-token: write
