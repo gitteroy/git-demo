@@ -36,6 +36,18 @@ build {
     script = "./scripts/setup.sh"
   }
 
+  # OS Hardening
+  provisioner "shell" {
+    inline = [
+      "# Update system packages",
+      "sudo apt-get update -y && sudo apt-get upgrade -y",
+      "# Install security updates",
+      "sudo unattended-upgrade -d",
+      "# Configure automatic security updates",
+      "echo 'Unattended-Upgrade::Automatic-Reboot \"false\";' | sudo tee -a /etc/apt/apt.conf.d/50unattended-upgrades"
+    ]
+  }
+
   # Upload the whole app folder
   provisioner "file" {
     source      = "./app"
