@@ -17,6 +17,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    # Can be
+    # triggered by a push to main with modified index.html OR
+    # triggered by upstream workflow running successfully
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+
     permissions:
       id-token: write
       contents: read
