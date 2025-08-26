@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pip packages
-        run: python -m pip install -r requirements.txt
+        run: cd ./sast/app && python -m pip install -r requirements.txt
 
       - name: Perform pip audit
         uses: pypa/gh-action-pip-audit@v1.0.6
