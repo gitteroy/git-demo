@@ -23,9 +23,9 @@ def send_message(chat_id, text, bot_token):
     """Sends a message back to the Telegram user."""
     telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {
-        "chat_id": str(chat_id),  # Ensure chat_id is string
+        "chat_id": str(chat_id),
         "text": text,
-        "parse_mode": "HTML"  # Optional: allows HTML formatting
+        "parse_mode": "HTML"
     }
     
     try:
@@ -35,7 +35,7 @@ def send_message(chat_id, text, bot_token):
         response = requests.post(
             telegram_api_url, 
             json=payload,
-            timeout=10  # Add timeout to prevent hanging
+            timeout=10
         )
         
         print(f"Telegram API response status: {response.status_code}")
@@ -80,15 +80,13 @@ def lambda_handler(event, context):
                 "body": json.dumps({"message": "Not a valid Telegram message"})
             }
 
-        # Generate response based on user input
         if user_text == "/start":
-            reply_text = "Hello! I am a simple Lambda-powered bot. Try the `/about` command."
+            reply_text = "Hello! I am a simple telegram bot. Try the `/about` command."
         elif user_text == "/about":
-            reply_text = "This bot runs on AWS Lambda and is now fast enough to avoid timeouts! 🚀"
+            reply_text = "This bot runs on AWS Lambda (:"
         else:
             reply_text = "Sorry, I only understand `/start` and `/about`."
 
-        # Send the message
         success = send_message(chat_id, reply_text, bot_token)
         
         if success:
