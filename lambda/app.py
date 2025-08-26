@@ -22,11 +22,7 @@ def get_bot_token():
 def send_message(chat_id, text, bot_token):
     """Sends a message back to the Telegram user."""
     telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "Markdown"
-    }
+    payload = {"chat_id": chat_id, "text": text}
     try:
         response = requests.post(telegram_api_url, json=payload)
         response.raise_for_status()
@@ -41,29 +37,20 @@ def lambda_handler(event, context):
         return {"statusCode": 500, "body": "Internal server error: Bot token not configured."}
 
     try:
-        print("Received event:", json.dumps(event))
-        
         body = json.loads(event.get("body", "{}"))
         message = body.get("message", {})
         chat_id = message.get("chat", {}).get("id")
         user_text = message.get("text", "").strip().lower()
 
         if not chat_id:
-            print("Event is not a recognizable Telegram message.")
             return {"statusCode": 200, "body": "Not a Telegram message"}
 
-        # --- Bot Logic ---
         if user_text == "/start":
-            reply_text = "Hello! I am a Lambda-powered bot. Try the `/time` command."
-        elif user_text == "/time":
-            time_api_url = "https://timeapi.io/api/Time/current/zone?timeZone=Asia/Singapore"
-            time_response = requests.get(time_api_url)
-            time_response.raise_for_status()
-            time_data = time_response.json()
-            current_time = time_data.get("dateTime")
-            reply_text = f"The current time in Singapore is: *{current_time}*"
+            reply_text = "Hello! I am a simple Lambda-powered bot. Try the `/about` command."
+        elif user_text == "/about":
+            reply_text = "This bot runs on AWS Lambda and is now fast enough to avoid timeouts! 🚀"
         else:
-            reply_text = "Sorry, I don't understand that command. Try `/start` or `/time`."
+            reply_text = "Sorry, I only understand `/start` and `/about`."
 
         send_message(chat_id, reply_text, bot_token)
 
