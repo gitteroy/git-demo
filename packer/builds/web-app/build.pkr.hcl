@@ -51,4 +51,92 @@ build {
       "npm install"
     ]
   }
+
+  # Create systemd service for the app
+  provisioner "shell" {
+    inline = [
+      "echo '[Unit]' | sudo tee /etc/systemd/system/myapp.service",
+      "echo 'Description=My Express App' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'After=network.target' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo '' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo '[Service]' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'ExecStart=/usr/bin/node /home/ubuntu/app/index.js' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'WorkingDirectory=/home/ubuntu/app' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'Restart=always' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'User=ubuntu' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'Group=ubuntu' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo '' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo '[Install]' | sudo tee -a /etc/systemd/system/myapp.service",
+      "echo 'WantedBy=multi-user.target' | sudo tee -a /etc/systemd/system/myapp.service",
+      "sudo systemctl enable myapp.service"
+    ]
+  }
+
+  # Install and configure CloudWatch Agent
+  provisioner "shell" {
+    inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get install -y wget unzip",
+      "wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
+      "sudo dpkg -i amazon-cloudwatch-agent.deb",
+      "sudo mkdir -p /opt/aws/amazon-cloudwatch-agent/etc",
+
+      # Write CloudWatch config (logs + metrics)
+      <<EOT | sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+  "metrics": {
+    "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          { "name": "cpu_usage_idle", "rename": "CPU_IDLE", "unit": "Percent" },
+          { "name": "cpu_usage_user", "rename": "CPU_USER", "unit": "Percent" },
+          { "name": "cpu_usage_system", "rename": "CPU_SYSTEM", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60,
+        "totalcpu": true
+      },
+      "mem": {
+        "measurement": [
+          { "name": "mem_used_percent", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60
+      },
+      "disk": {
+        "measurement": [
+          { "name": "disk_used_percent", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [ "*" ]
+      },
+      "net": {
+        "measurement": [
+          "bytes_sent",
+          "bytes_recv"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [ "*" ]
+      }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "journald": {
+        "collect_list": [
+          {
+            "unit": "myapp.service",
+            "log_group_name": "/my-app/ec2",
+            "log_stream_name": "{instance_id}-app"
+          }
+        ]
+      }
+    }
+  }
+}
+EOT
+      ,
+
+      "sudo systemctl enable amazon-cloudwatch-agent",
+      "sudo systemctl start amazon-cloudwatch-agent"
+    ]
+  }
 }
