@@ -24,7 +24,6 @@ module "telegram_bot_lambda" {
   filename      = data.archive_file.lambda_zip.output_path
 }
 
-
 module "api_gateway" {
   source               = "./modules/apigateway"
   api_name             = "telegram-bot-api"
