@@ -19,7 +19,6 @@ source "amazon-ebs" "ubuntu" {
     Name        = "Packer-AMI-${local.timestamp}"
     Environment = "build"
     ManagedBy   = "packer"
-    BuildId     = "${env("GITHUB_RUN_ID")}"
     Component   = "${var.ami_prefix}"
   }
 
@@ -27,14 +26,7 @@ source "amazon-ebs" "ubuntu" {
     Name        = "Packer-Builder-${local.timestamp}"
     Environment = "build" 
     ManagedBy   = "packer"
-    BuildId     = "${env("GITHUB_RUN_ID")}"
     Component   = "${var.ami_prefix}"
-  }
-
-  security_group_filter {
-    filters = {
-      "tag:ManagedBy" = "packer"
-    }
   }
 
   source_ami_filter {
