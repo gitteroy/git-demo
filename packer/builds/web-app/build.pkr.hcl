@@ -17,7 +17,7 @@ source "amazon-ebs" "ubuntu" {
 
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/*ubuntu-noble-24.04-amd64-server-*"
+      name                = "ubuntu/images/*ubuntu-noble-24.04-amd64-server-*" # latest Ubuntu LTS
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
