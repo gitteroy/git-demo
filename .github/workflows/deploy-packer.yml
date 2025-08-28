@@ -17,7 +17,7 @@ jobs:
       contents: read
     
     env:
-      PKR_VAR_AMI_PREFIX: ${{ vars.AMI_PREFIX }}
+      PKR_VAR_ami_prefix: ${{ vars.AMI_PREFIX }}
 
     steps:
       - uses: actions/checkout@v4
