@@ -5,7 +5,7 @@ conn = psycopg2.connect(
     database="some_data",
     user="db_user",
     password="db_p4ssw0rd",
-    port="5432"
+    port="5432" 
 )
 
 def send_sql_query(username: str, password: str):

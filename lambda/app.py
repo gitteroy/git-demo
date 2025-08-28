@@ -25,7 +25,7 @@ def send_message(chat_id, text, bot_token):
     payload = {
         "chat_id": str(chat_id),
         "text": text,
-        "parse_mode": "HTML"
+        "parse_mode": "HTML" 
     }
     
     try:

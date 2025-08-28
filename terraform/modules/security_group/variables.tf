@@ -1,4 +1,4 @@
-variable "my_ip" {}
+# variable "my_ip" {}
 
 //====== Project Variables ======\\
 variable "project_name" {}

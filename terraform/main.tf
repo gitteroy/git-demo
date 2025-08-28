@@ -2,9 +2,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "http" "my_ip" {
-  url = "https://ipv4.icanhazip.com"
-}
+# data "http" "my_ip" {
+#   url = "https://ipv4.icanhazip.com"
+# }
 
 resource "aws_secretsmanager_secret" "bot_token" {
   name                    = "${var.project_name}-${var.project_env}-bot-token"
@@ -116,7 +116,7 @@ module "security_group" {
   project_name = var.project_name
   project_env  = var.project_env
   vpc_id       = aws_vpc.vpc.id
-  my_ip        = data.http.my_ip.response_body
+  # my_ip        = data.http.my_ip.response_body
 }
 
 module "ec2_instance" {
