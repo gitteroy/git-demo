@@ -133,15 +133,19 @@ jobs:
         with:
           role-to-assume: ${{ secrets.ROLE_ARN }}
           aws-region: ${{ vars.REGION }}
-      - name: Deploy Lambda
+      - name: Package Lambda
         working-directory: ./lambda
         run: |
           pip install -r requirements.txt -t ./package
           cp app.py ./package/
-          cd package && zip -r ../lambda-deployment.zip .
-          aws lambda update-function-code \
-            --function-name ${{ vars.LAMBDA_NAME }} \
-            --zip-file fileb://lambda-deployment.zip
+      - name: Deploy to AWS Lambda
+        uses: aws-actions/aws-lambda-deploy@v1.1.0
+        with:
+          function-name: ${{ vars.LAMBDA_NAME }}
+          code-artifacts-dir: lambda/package
+          handler: app.lambda_handler
+          runtime: python3.11
+          publish: true
 
   # Notify results
   notify:
