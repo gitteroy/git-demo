@@ -126,8 +126,7 @@ module "ec2_instance" {
   ec2_security_group_id = module.security_group.app_security_group.id
   subnet_id             = aws_subnet.a.id
   vpc_id                = aws_vpc.vpc.id
-  # user_data       = file("${path.root}/../scripts/user_data.sh")
-
-  # ami_id                = var.ami_id # "ami-0cfd1ec17e8c33b53"
-  ami_prefix = var.ami_prefix
+  ami_prefix            = var.ami_prefix
+  # ami_id                = var.ami_id
+  # user_data             = file("${path.root}/../scripts/user_data.sh")
 }
