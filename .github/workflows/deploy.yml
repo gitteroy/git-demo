@@ -105,10 +105,10 @@ jobs:
           terraform plan -input=false
           terraform apply -auto-approve -input=false
 
-  # Deploy website (depends on terraform if both changed)
+  # Deploy website
   website:
-    needs: [changes, terraform]
-    if: always() && needs.changes.outputs.website == 'true' && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped')
+    needs: changes
+    if: needs.changes.outputs.website == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -119,10 +119,10 @@ jobs:
       - name: Upload to S3
         run: aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
 
-  # Deploy lambda (depends on terraform if both changed)
+  # Deploy lambda
   lambda:
-    needs: [changes, terraform]
-    if: always() && needs.changes.outputs.lambda == 'true' && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped')
+    needs: changes
+    if: needs.changes.outputs.lambda == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -154,9 +154,9 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            Deployment Complete
+            **Deployment Complete**
             Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
+            Version: ``${{ github.ref_name }}``
             
             Results:
             - SAST: ${{ needs.sast.result }}
@@ -164,3 +164,5 @@ jobs:
             - Terraform: ${{ needs.terraform.result }}
             - Website: ${{ needs.website.result }}
             - Lambda: ${{ needs.lambda.result }}
+
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
