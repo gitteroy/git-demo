@@ -2,8 +2,8 @@ name: Deploy with Packer
 on:
   push:
     branches:
-      - feature/integration
-      # - main
+      # - feature/integration
+      - main
     paths:
       - 'packer/**'
 env:

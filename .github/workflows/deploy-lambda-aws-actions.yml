@@ -3,7 +3,7 @@ name: Deploy to Lambda using aws-actions/aws-lambda-deploy
 on:
   push:
     branches:
-      - main
+      - feature/integration
     paths:
       - 'lambda/**'
 
@@ -12,7 +12,7 @@ on:
     types:
       - completed
     branches:
-      - main
+      - feature/integration
 
 permissions:
   id-token: write

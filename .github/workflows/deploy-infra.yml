@@ -3,8 +3,8 @@ name: Deploy Terraform
 on:
   push:
     branches:
-      - feature/integration
-      # - main
+      # - feature/integration
+      - main
     paths:
       - 'terraform/**'
   workflow_dispatch: # Allows manual triggering

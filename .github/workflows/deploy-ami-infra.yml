@@ -1,0 +1,178 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches:
+      - feature/integration
+      # - main
+    paths:
+      - 'terraform/**'
+      - 'packer/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  check-changes:
+    name: Check What Changed
+    runs-on: ubuntu-latest
+    outputs:
+      packer-changed: ${{ steps.changes.outputs.packer }}
+      terraform-changed: ${{ steps.changes.outputs.terraform }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            packer:
+              - 'packer/**'
+            terraform:
+              - 'terraform/**'
+
+  build-ami:
+    name: Build AMI with Packer
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.packer-changed == 'true'
+    outputs:
+      ami-id: ${{ steps.packer-build.outputs.ami-id }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ vars.REGION }}
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: 1.11.1
+
+      - name: Run Packer Init
+        working-directory: ./packer/builds/web-app
+        run: packer init .
+
+      - name: Run Packer Validate
+        working-directory: ./packer/builds/web-app
+        run: packer validate .
+
+      - name: Run Packer Build
+        id: packer-build
+        working-directory: ./packer/builds/web-app
+        run: |
+          # Capture packer output and extract AMI ID
+          packer build -machine-readable . | tee packer-output.log
+          
+          # Extract AMI ID from packer output
+          AMI_ID=$(grep 'artifact,0,id' packer-output.log | cut -d',' -f6 | cut -d':' -f2)
+          echo "Built AMI: $AMI_ID"
+          echo "ami-id=$AMI_ID" >> $GITHUB_OUTPUT
+
+  get-latest-ami:
+    name: Get Latest AMI
+    runs-on: ubuntu-latest
+    needs: [check-changes, build-ami]
+    if: always() && !cancelled()
+    outputs:
+      ami-id: ${{ steps.ami-lookup.outputs.ami-id }}
+    
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+
+      - name: Get AMI ID
+        id: ami-lookup
+        run: |
+          if [ "${{ needs.build-ami.result }}" = "success" ]; then
+            # Use newly built AMI
+            AMI_ID="${{ needs.build-ami.outputs.ami-id }}"
+            echo "Using newly built AMI: $AMI_ID"
+          else
+            # Get latest AMI with specific tag/name pattern
+            AMI_ID=$(aws ec2 describe-images \
+              --owners self \
+              --filters "Name=name,Values=web-app-*" "Name=state,Values=available" \
+              --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
+              --output text)
+            echo "Using latest existing AMI: $AMI_ID"
+          fi
+          echo "ami-id=$AMI_ID" >> $GITHUB_OUTPUT
+
+  terraform:
+    name: Terraform Plan and Apply
+    runs-on: ubuntu-latest
+    needs: get-latest-ami
+    if: always() && !cancelled() && !failure()
+
+    env:
+      TF_VAR_s3_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_aws_region: ${{ vars.REGION }}
+      TF_VAR_lambda_function_name: ${{ vars.LAMBDA_NAME }}
+      TF_VAR_ami_id: ${{ needs.get-latest-ami.outputs.ami-id }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: |
+          echo "Using AMI ID: $TF_VAR_ami_id"
+          terraform plan -input=false
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
+        working-directory: ./terraform
+
+  notify:
+    name: Telegram Notification
+    runs-on: ubuntu-latest
+    needs: [build-ami, terraform]
+    if: always()
+    
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            Infrastructure Deployment Status
+            
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            
+            Packer Build: ${{ needs.build-ami.result || 'skipped' }}
+            Terraform: ${{ needs.terraform.result }}
+            AMI Used: ${{ needs.get-latest-ami.outputs.ami-id }}
+            
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
