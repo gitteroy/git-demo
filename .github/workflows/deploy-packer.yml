@@ -6,7 +6,6 @@ on:
       # - main
     paths:
       - 'packer/**'
-  workflow_dispatch: # Allows manual triggering
 
 env:
   AWS_REGION: ${{ vars.REGION }}
@@ -20,6 +19,8 @@ jobs:
     
     env:
       PKR_VAR_ami_prefix: ${{ vars.AMI_PREFIX }}
+      PKR_VAR_packer_vpc_id: ${{ vars.PACKER_VPC_ID }}
+      PKR_VAR_packer_subnet_id: ${{ vars.PACKER_SUBNET_ID }}
 
     steps:
       - uses: actions/checkout@v4

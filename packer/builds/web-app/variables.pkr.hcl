@@ -15,14 +15,12 @@ variable "region" {
   description = "AWS region"
 }
 
-variable "vpc_id" {
+variable "packer_vpc_id" {
   type        = string
-  default     = "vpc-0c4783b07aa53d0d5"
   description = "VPC ID for the build instance"
 }
 
-variable "subnet_id" {
+variable "packer_subnet_id" {
   type        = string
-  default     = "subnet-0f4ef02cbb5d89edd"
   description = "Subnet ID for the build instance"
 }

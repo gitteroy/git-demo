@@ -1,0 +1,166 @@
+name: Deploy Application
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+jobs:
+  # Detect what changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packer: ${{ steps.changes.outputs.packer }}
+      terraform: ${{ steps.changes.outputs.terraform }}
+      lambda: ${{ steps.changes.outputs.lambda }}
+      website: ${{ steps.changes.outputs.website }}
+      sast: ${{ steps.changes.outputs.sast }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            packer:
+              - 'packer/**'
+            terraform:
+              - 'terraform/**'
+            lambda:
+              - 'lambda/**'
+            website:
+              - 'index.html'
+            sast:
+              - 'sast/**'
+
+  # Security scans run first
+  sast:
+    needs: changes
+    if: needs.changes.outputs.sast == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pip packages
+        run: cd ./sast/app && python -m pip install -r requirements.txt
+      - uses: pypa/gh-action-pip-audit@v1.0.6
+        with:
+          inputs: ./sast/app/requirements.txt
+      - uses: PyCQA/bandit-action@v1
+        with:
+          targets: ./sast/app
+
+  # Build AMI if packer changed
+  packer:
+    needs: changes
+    if: needs.changes.outputs.packer == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PKR_VAR_ami_prefix: ${{ vars.AMI_PREFIX }}
+      PKR_VAR_packer_vpc_id: ${{ vars.PACKER_VPC_ID }}
+      PKR_VAR_packer_subnet_id: ${{ vars.PACKER_SUBNET_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+      - uses: hashicorp/setup-packer@main
+        with:
+          version: 1.11.1
+      - name: Build AMI
+        working-directory: ./packer/builds/web-app
+        run: |
+          packer init .
+          packer validate .
+          packer build .
+
+  # Deploy infrastructure (depends on AMI if both changed)
+  terraform:
+    needs: [changes, packer]
+    if: always() && needs.changes.outputs.terraform == 'true' && (needs.packer.result == 'success' || needs.packer.result == 'skipped')
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_s3_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_aws_region: ${{ vars.REGION }}
+      TF_VAR_lambda_function_name: ${{ vars.LAMBDA_NAME }}
+      TF_VAR_AMI_PREFIX: ${{ vars.AMI_PREFIX }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+      - name: Deploy Infrastructure
+        working-directory: ./terraform
+        run: |
+          terraform init
+          terraform plan -input=false
+          terraform apply -auto-approve -input=false
+
+  # Deploy website (depends on terraform if both changed)
+  website:
+    needs: [changes, terraform]
+    if: always() && needs.changes.outputs.website == 'true' && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+      - name: Upload to S3
+        run: aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
+
+  # Deploy lambda (depends on terraform if both changed)
+  lambda:
+    needs: [changes, terraform]
+    if: always() && needs.changes.outputs.lambda == 'true' && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          aws-region: ${{ vars.REGION }}
+      - name: Deploy Lambda
+        working-directory: ./lambda
+        run: |
+          pip install -r requirements.txt -t ./package
+          cp app.py ./package/
+          cd package && zip -r ../lambda-deployment.zip .
+          aws lambda update-function-code \
+            --function-name ${{ vars.LAMBDA_NAME }} \
+            --zip-file fileb://lambda-deployment.zip
+
+  # Notify results
+  notify:
+    needs: [sast, packer, terraform, website, lambda]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            Deployment Complete
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            
+            Results:
+            - SAST: ${{ needs.sast.result }}
+            - Packer: ${{ needs.packer.result }}
+            - Terraform: ${{ needs.terraform.result }}
+            - Website: ${{ needs.website.result }}
+            - Lambda: ${{ needs.lambda.result }}
