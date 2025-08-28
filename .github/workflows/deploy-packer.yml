@@ -6,6 +6,8 @@ on:
       # - main
     paths:
       - 'packer/**'
+  workflow_dispatch: # Allows manual triggering
+
 env:
   AWS_REGION: ${{ vars.REGION }}
 jobs:
