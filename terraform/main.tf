@@ -7,7 +7,8 @@ data "http" "my_ip" {
 }
 
 resource "aws_secretsmanager_secret" "bot_token" {
-  name = "timetosaygoodbye-telegram-bot-token"
+  name                    = "${var.project_name}-${var.project_env}-bot-token"
+  recovery_window_in_days = 0
 }
 
 module "s3_website" {

@@ -32,56 +32,21 @@ build {
     "source.amazon-ebs.ubuntu"
   ]
 
-  # Run your setup script first (e.g. install nvm, node, etc.)
   provisioner "shell" {
     script = "./scripts/setup.sh"
   }
 
-  # OS Hardening
-  provisioner "shell" {
-    inline = [
-      "# Update system packages",
-      "sudo apt-get update -y && sudo apt-get upgrade -y",
-      "# Install security updates",
-      "sudo unattended-upgrade -d",
-      "# Configure automatic security updates",
-      "echo 'Unattended-Upgrade::Automatic-Reboot \"false\";' | sudo tee -a /etc/apt/apt.conf.d/50unattended-upgrades"
-    ]
-  }
-
-  # Upload the whole app folder
   provisioner "file" {
     source      = "./app"
     destination = "/home/ubuntu/app"
   }
 
-  # Install dependencies inside the uploaded app
   provisioner "shell" {
     inline = [
       "export NVM_DIR=\"$HOME/.nvm\"",
       "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"",
       "cd /home/ubuntu/app",
       "npm install"
-    ]
-  }
-
-  # Create systemd service for the app
-  provisioner "shell" {
-    inline = [
-      "echo '[Unit]' | sudo tee /etc/systemd/system/myapp.service",
-      "echo 'Description=My Express App' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'After=network.target' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo '' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo '[Service]' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'ExecStart=/usr/bin/node /home/ubuntu/app/index.js' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'WorkingDirectory=/home/ubuntu/app' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'Restart=always' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'User=ubuntu' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'Group=ubuntu' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo '' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo '[Install]' | sudo tee -a /etc/systemd/system/myapp.service",
-      "echo 'WantedBy=multi-user.target' | sudo tee -a /etc/systemd/system/myapp.service",
-      "sudo systemctl enable myapp.service"
     ]
   }
 
@@ -104,5 +69,4 @@ build {
       "sudo systemctl start amazon-cloudwatch-agent"
     ]
   }
-
 }
