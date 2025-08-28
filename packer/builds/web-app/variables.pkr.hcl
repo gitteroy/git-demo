@@ -1,6 +1,5 @@
-variable "ami_name" {
+variable "ami_prefix" {
   type        = string
-  default     = "raid-pkr-example"
   description = "Base name for the generated AMI"
 }
 
