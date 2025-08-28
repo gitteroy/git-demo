@@ -13,7 +13,29 @@ source "amazon-ebs" "ubuntu" {
   associate_public_ip_address = true
   ssh_interface               = "public_ip"
   ssh_username                = "ubuntu"
-  ssh_timeout                 = "15m"
+  ssh_timeout                 = "10m"
+
+  tags = {
+    Name        = "Packer-AMI-${local.timestamp}"
+    Environment = "build"
+    ManagedBy   = "packer"
+    BuildId     = "${env("GITHUB_RUN_ID")}"
+    Component   = "${var.ami_prefix}"
+  }
+
+  run_tags = {
+    Name        = "Packer-Builder-${local.timestamp}"
+    Environment = "build" 
+    ManagedBy   = "packer"
+    BuildId     = "${env("GITHUB_RUN_ID")}"
+    Component   = "${var.ami_prefix}"
+  }
+
+  security_group_filter {
+    filters = {
+      "tag:ManagedBy" = "packer"
+    }
+  }
 
   source_ami_filter {
     filters = {
@@ -24,6 +46,8 @@ source "amazon-ebs" "ubuntu" {
     most_recent = true
     owners      = ["099720109477"]  # Canonical
   }
+
+  shutdown_behavior = "terminate"
 }
 
 build {
