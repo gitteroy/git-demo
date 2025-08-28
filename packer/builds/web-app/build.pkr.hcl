@@ -7,8 +7,8 @@ source "amazon-ebs" "ubuntu" {
   instance_type = var.instance_type
   region        = var.region
 
-  vpc_id                   = "vpc-0c4783b07aa53d0d5"
-  subnet_id                = "subnet-0f4ef02cbb5d89edd"
+  vpc_id                   = "vpc-0c4783b07aa53d0d5"    # created in console
+  subnet_id                = "subnet-0f4ef02cbb5d89edd" # created in console
 
   associate_public_ip_address = true
   ssh_interface               = "public_ip"

@@ -2,9 +2,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-# data "http" "my_ip" {
-#   url = "https://ipv4.icanhazip.com"
-# }
+data "http" "my_ip" {
+  url = "https://ipv4.icanhazip.com"
+}
 
 resource "aws_secretsmanager_secret" "bot_token" {
   name                    = "${var.project_name}-${var.project_env}-bot-token"
@@ -129,5 +129,5 @@ module "ec2_instance" {
   # user_data       = file("${path.root}/../scripts/user_data.sh")
 
   # ami_id                = var.ami_id # "ami-0cfd1ec17e8c33b53"
-  ami_prefix            = var.ami_prefix
+  ami_prefix = var.ami_prefix
 }
