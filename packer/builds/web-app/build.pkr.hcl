@@ -7,8 +7,13 @@ source "amazon-ebs" "ubuntu" {
   instance_type = var.instance_type
   region        = var.region
 
-  communicator  = "ssm"
-  ssh_username  = "ubuntu"
+  vpc_id                   = "vpc-0c4783b07aa53d0d5"
+  subnet_id                = "subnet-0f4ef02cbb5d89edd"
+
+  associate_public_ip_address = true
+  ssh_interface               = "public_ip"
+  ssh_username                = "ubuntu"
+  ssh_timeout                 = "15m"
 
   source_ami_filter {
     filters = {
@@ -17,7 +22,7 @@ source "amazon-ebs" "ubuntu" {
       virtualization-type = "hvm"
     }
     most_recent = true
-    owners      = ["099720109477"]
+    owners      = ["099720109477"]  # Canonical
   }
 }
 
