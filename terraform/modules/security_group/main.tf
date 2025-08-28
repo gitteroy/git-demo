@@ -7,14 +7,14 @@ resource "aws_security_group" "app_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${chomp(var.my_ip)}/32"]
+    cidr_blocks = ["${chomp(var.my_ip)}/32", "0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${chomp(var.my_ip)}/32"]
+    cidr_blocks = ["${chomp(var.my_ip)}/32", "0.0.0.0/0"]
   }
 
   egress {

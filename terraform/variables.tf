@@ -36,14 +36,20 @@ variable "vpc_cidr_block" {
 
 ## ec2 variable
 
+variable "instance_type" {
+  description = "The type of instance to use"
+  type        = string
+  default     = "t2.micro"
+}
+
 variable "ami_id" {
   description = "The ID of the AMI to use for the EC2 instance"
   type        = string
   default     = "ami-0435fcf800fb5418d"
 }
 
-variable "instance_type" {
-  description = "The type of instance to use"
+variable "ami_prefix" {
+  description = "AMI name prefix to search for the most recent AMI built by Packer"
   type        = string
-  default     = "t2.micro"
+  default     = "packer-terraform-dev"
 }

@@ -2,8 +2,8 @@ name: Deploy with Packer
 on:
   push:
     branches:
-      # - feature/integration
-      - main
+      - feature/integration
+      # - main
     paths:
       - 'packer/**'
 env:
@@ -16,6 +16,9 @@ jobs:
       id-token: write
       contents: read
     
+    env:
+      PKR_VAR_AMI_PREFIX: ${{ vars.AMI_PREFIX }}
+
     steps:
       - uses: actions/checkout@v4
 

@@ -2,9 +2,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "http" "my_ip" {
-  url = "https://ipv4.icanhazip.com"
-}
+# data "http" "my_ip" {
+#   url = "https://ipv4.icanhazip.com"
+# }
 
 resource "aws_secretsmanager_secret" "bot_token" {
   name                    = "${var.project_name}-${var.project_env}-bot-token"
@@ -123,9 +123,11 @@ module "ec2_instance" {
   source = "./modules/ec2"
 
   instance_type         = var.instance_type
-  ami_id                = var.ami_id # "ami-0cfd1ec17e8c33b53"
   ec2_security_group_id = module.security_group.app_security_group.id
   subnet_id             = aws_subnet.a.id
   vpc_id                = aws_vpc.vpc.id
   # user_data       = file("${path.root}/../scripts/user_data.sh")
+
+  # ami_id                = var.ami_id # "ami-0cfd1ec17e8c33b53"
+  ami_prefix            = var.ami_prefix
 }

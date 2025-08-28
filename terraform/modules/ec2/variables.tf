@@ -1,6 +1,13 @@
 variable "ami_id" {
   description = "The ID of the AMI to use for the EC2 instance"
   type        = string
+  default     = ""
+}
+
+variable "ami_prefix" {
+  description = "AMI name prefix to search for the most recent AMI built by Packer"
+  type        = string
+  default     = ""
 }
 
 variable "instance_type" {

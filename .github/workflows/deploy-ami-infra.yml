@@ -3,8 +3,8 @@ name: Deploy Infrastructure
 on:
   push:
     branches:
-      - feature/integration
-      # - main
+      # - feature/integration
+      - test
     paths:
       - 'terraform/**'
       - 'packer/**'
