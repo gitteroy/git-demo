@@ -7,23 +7,19 @@ source "amazon-ebs" "ubuntu" {
   instance_type = var.instance_type
   region        = var.region
 
-  # vpc_id        = var.vpc_id
-  # subnet_id     = var.subnet_id
-
   associate_public_ip_address = true
+  ssh_interface               = "public_ip"
+  ssh_username                = "ubuntu"
+  ssh_timeout                 = "10m"
 
-  ssh_interface = "public_ip"
-  ssh_username  = "ubuntu"
-  ssh_timeout   = "10m"
-  
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
+      name                = "ubuntu/images/*ubuntu-noble-24.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
     most_recent = true
-    owners      = ["099720109477"] # canonical
+    owners      = ["099720109477"]  # Canonical
   }
 }
 
