@@ -3,7 +3,7 @@ name: Deploy to Lambda using aws-actions/aws-lambda-deploy
 on:
   push:
     branches:
-      - feature/integration
+      - never
     paths:
       - 'lambda/**'
 

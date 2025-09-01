@@ -3,7 +3,7 @@ name: Deploy to S3
 on:
   push:
     branches:
-      - feature/integration
+      - never
     paths:
       - 'index.html'
   workflow_run:
@@ -11,7 +11,7 @@ on:
     types:
       - completed
     branches:
-      - feature/integration
+      - never
 
 jobs:
   deploy:

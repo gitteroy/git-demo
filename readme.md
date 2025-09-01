@@ -13,6 +13,8 @@
     - `AMI_PREFIX`: AMI name prefix to search for the most recent AMI built by Packer
     - `LAMBDA_NAME`: Name for your telegram bot lambda function
     - `S3_BUCKET_NAME`: Name for your S3 bucket that will contain the static website code
+    - `PACKER_VPC_ID`: 
+    - `PACKER_SUBNET_ID`: 
 
 ### Set up GitHub OIDC Identity Provider in AWS
 
@@ -70,9 +72,35 @@ permissions:
         - name: Configure AWS credentials from OpenID Connect (OIDC)
           uses: aws-actions/configure-aws-credentials@v2
           with:
-            role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsRole
+            role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
             aws-region: ${{ secrets.REGION }}
 ```
 
+### Create Telegram Bot (Optional)
+
+- This is to enable telegram notifications after workflow runs (final stage of workflow).
+
+1. Chat with @BotFather on Telegram
+2. Create a New Bot and obtain API Key (`TELEGRAM_BOT_TOKEN`)
+3. Get your Telegram Chat ID by chatting with @RawDataBot (`TELEGRAM_CHAT_ID`)
+4. Add these variables to your Github secrets: `TELEGRAM_CHAT_ID`, `TELEGRAM_BOT_TOKEN`
+
 ## Deployment
 
+- The final working github workflow is contained in [deploy.yml](.github/workflows/deploy.yml)
+- This workflow is triggered by tagged commits in the syntax of x.x.x, where x are numbers, e.g., 1.2.34
+
+### Run git commands
+
+```sh
+git tag 1.0.0
+git push --tags
+```
+
+### Observe Workflow
+
+- Go to Github Repo > Actions
+- The SAST job should fail because it has identified a supply-chain vulnerability in our Python Library (implanted on purpose)
+- The remaining jobs should pass, if not, go into the failed jobs to troubleshoot them
+- Below is an example of a successful workflow:
+![Example Workflow](.github/workflows/github-actions-workflow.png)
