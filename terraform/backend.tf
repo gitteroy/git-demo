@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket       = "console-ri-test-bucket"
+    bucket       = "your-s3-bucket-name"
     key          = "terraform.tfstate"
     region       = "ap-southeast-1"
     use_lockfile = true

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TF_VAR_s3_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_s3_bucket_name: ${{ vars.S3_WEBSITE_BUCKET_NAME }}
       TF_VAR_aws_region: ${{ vars.REGION }}
       TF_VAR_lambda_function_name: ${{ vars.LAMBDA_NAME }}
       TF_VAR_AMI_PREFIX: ${{ vars.AMI_PREFIX }}

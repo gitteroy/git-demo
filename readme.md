@@ -12,9 +12,14 @@
     - `REGION`: ap-southeast-1
     - `AMI_PREFIX`: AMI name prefix to search for the most recent AMI built by Packer
     - `LAMBDA_NAME`: Name for your telegram bot lambda function
-    - `S3_BUCKET_NAME`: Name for your S3 bucket that will contain the static website code
+    - `S3_WEBSITE_BUCKET_NAME`: Name for your S3 bucket that will contain the static website code
     - `PACKER_VPC_ID`: VPC ID of a temp vpc for your packer to run in
     - `PACKER_SUBNET_ID`: Subnet ID of a temp vpc for your packer to run in
+
+### Create S3 Bucket to store Terraform State
+
+1. Create an S3 Bucket in your AWS Account
+2. Edit `your-s3-bucket-name` to your actual S3 bucket name in [backend.tf](terraform/backend.tf)
 
 ### Set up GitHub OIDC Identity Provider in AWS
 

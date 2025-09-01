@@ -43,4 +43,4 @@ jobs:
 
       - name: Upload index.html to S3
         run: |
-          aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
+          aws s3 cp index.html s3://${{ vars.S3_WEBSITE_BUCKET_NAME }}/index.html --content-type text/html

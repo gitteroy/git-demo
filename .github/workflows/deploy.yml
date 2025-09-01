@@ -85,7 +85,7 @@ jobs:
     if: always() && needs.changes.outputs.terraform == 'true' && (needs.packer.result == 'success' || needs.packer.result == 'skipped')
     runs-on: ubuntu-latest
     env:
-      TF_VAR_s3_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_s3_bucket_name: ${{ vars.S3_WEBSITE_BUCKET_NAME }}
       TF_VAR_aws_region: ${{ vars.REGION }}
       TF_VAR_lambda_function_name: ${{ vars.LAMBDA_NAME }}
       TF_VAR_AMI_PREFIX: ${{ vars.AMI_PREFIX }}
@@ -117,7 +117,7 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_ARN }}
           aws-region: ${{ vars.REGION }}
       - name: Upload to S3
-        run: aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
+        run: aws s3 cp index.html s3://${{ vars.S3_WEBSITE_BUCKET_NAME }}/index.html --content-type text/html
 
   # Deploy lambda
   lambda:

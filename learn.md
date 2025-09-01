@@ -284,7 +284,7 @@ Go to your `repo: Settings: Secrets and Variables: Actions:`
 ```md
 Variables:
 - AWS_ACCOUNT_ID: your-aws-account-id
-- S3_BUCKET_NAME: your-unique-bucket-name
+- S3_WEBSITE_BUCKET_NAME: your-unique-bucket-name
 - REGION: ap-southeast-1
 - LAMBDA_NAME: telegram-bot-function
 
@@ -334,7 +334,7 @@ on:
 steps:
   - name: Upload index.html to S3
     run: |
-      aws s3 cp index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html --content-type text/html
+      aws s3 cp index.html s3://${{ vars.S3_WEBSITE_BUCKET_NAME }}/index.html --content-type text/html
 ```
 
 #### Lambda Function Deployment
