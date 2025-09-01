@@ -3,7 +3,6 @@ name: Run SAST scans
 on:
   push:
     branches:
-      - main
       - feature/sast
     paths:
       - 'sast/**'
