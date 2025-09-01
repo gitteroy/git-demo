@@ -49,7 +49,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GithubActionsRole
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ vars.REGION }}
 
@@ -90,7 +90,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GithubActionsRole
           aws-region: ${{ vars.REGION }}
 
       - name: Get AMI ID
@@ -130,7 +130,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::544067237869:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GithubActionsRole
           aws-region: ${{ vars.REGION }}
 
       - name: Setup Terraform

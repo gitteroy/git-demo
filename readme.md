@@ -13,8 +13,8 @@
     - `AMI_PREFIX`: AMI name prefix to search for the most recent AMI built by Packer
     - `LAMBDA_NAME`: Name for your telegram bot lambda function
     - `S3_BUCKET_NAME`: Name for your S3 bucket that will contain the static website code
-    - `PACKER_VPC_ID`: 
-    - `PACKER_SUBNET_ID`: 
+    - `PACKER_VPC_ID`: VPC ID of a temp vpc for your packer to run in
+    - `PACKER_SUBNET_ID`: Subnet ID of a temp vpc for your packer to run in
 
 ### Set up GitHub OIDC Identity Provider in AWS
 

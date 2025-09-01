@@ -7,7 +7,6 @@ variable "aws_region" {
 variable "s3_bucket_name" {
   description = "The name of the S3 bucket for the website."
   type        = string
-  default     = "elroy-git-demo-bucket-0000"
 }
 
 variable "lambda_function_name" {
@@ -21,7 +20,6 @@ variable "lambda_function_name" {
 variable "project_name" {
   description = "The name of the project."
   type        = string
-  default     = "packer-terraform"
 }
 variable "project_env" {
   description = "The environment of the project (e.g., dev, prod)."
@@ -51,5 +49,4 @@ variable "ami_id" {
 variable "ami_prefix" {
   description = "AMI name prefix to search for the most recent AMI built by Packer"
   type        = string
-  default     = "packer-terraform-dev"
 }
